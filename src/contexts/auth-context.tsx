@@ -1,0 +1,70 @@
+import { createContext, type PropsWithChildren, useCallback, useEffect, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+import { type AuthUser, canLogin } from '@/modules/auth';
+import { userQueryKeys, useUserProfile } from '@/modules/users';
+
+import { tokenStorage } from '@/libs/storage';
+
+type AuthContextType = {
+  user: AuthUser | null;
+  clearAuth: () => void;
+  refreshUser: () => void;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+};
+
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: PropsWithChildren) => {
+  const queryClient = useQueryClient();
+  const hasToken = tokenStorage.hasValidToken();
+  const hasShownAccessDenied = useRef(false);
+
+  const { data: profileData, isLoading: isProfileLoading } = useUserProfile();
+
+  useEffect(() => {
+    if (profileData && !canLogin(profileData.role) && !hasShownAccessDenied.current) {
+      hasShownAccessDenied.current = true;
+      tokenStorage.clearTokens();
+      queryClient.setQueryData(userQueryKeys.profile(), null);
+      toast.error('Access denied. Please contact an administrator for access.');
+    }
+  }, [profileData, queryClient]);
+
+  useEffect(() => {
+    if (!hasToken) {
+      hasShownAccessDenied.current = false;
+    }
+  }, [hasToken]);
+
+  const user = profileData && canLogin(profileData.role) ? (profileData as AuthUser) : null;
+
+  const clearAuth = useCallback(() => {
+    tokenStorage.clearTokens();
+    queryClient.setQueryData(userQueryKeys.profile(), null);
+    queryClient.removeQueries({ queryKey: userQueryKeys.all });
+  }, [queryClient]);
+
+  const refreshUser = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: userQueryKeys.profile() });
+  }, [queryClient]);
+
+  const isAuthenticated = !!user && hasToken;
+  const isLoading = hasToken && isProfileLoading;
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        clearAuth,
+        refreshUser,
+        isAuthenticated,
+        isLoading,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};

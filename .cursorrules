@@ -1,0 +1,514 @@
+# Frontend Template - Cursor Rules
+
+## Tech Stack
+
+- React 19
+- Vite 7
+- TypeScript 5 (strict mode)
+- TanStack Query (React Query)
+- React Router DOM 7
+- React Hook Form + Zod
+- Axios
+- Tailwind CSS 4
+- ESLint 9 + Prettier
+- Untitled UI React
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── application/     # Application-level components (DataTable, ErrorBoundary, etc.)
+│   ├── base/            # Base UI components
+│   │   └── _rhf/        # React Hook Form adapted components
+│   ├── guards/          # Route guards
+│   └── page-loading.tsx
+├── contexts/            # React contexts
+├── hooks/               # Custom hooks
+├── layouts/             # Layout components
+├── libs/               # Utilities and helpers
+│   ├── storage/        # Token storage
+│   ├── validators/     # Zod validation schemas
+│   └── env.ts          # Environment configuration
+├── modules/            # Feature modules (feature-based architecture)
+│   ├── auth/
+│   ├── users/
+│   └── common/         # Shared utilities
+├── pages/              # Page components
+├── providers/          # App providers
+├── routes/             # Route configuration
+├── services/           # Axios instances
+├── styles/             # Global CSS
+└── utils/              # Utility functions
+```
+
+## Naming Conventions
+
+| Type                 | Convention                  | Example                                 |
+| -------------------- | --------------------------- | --------------------------------------- |
+| Page components      | PascalCase + Page           | `UsersPage.tsx`                         |
+| Module UI components | PascalCase                  | `UsersTable.tsx`, `CreateUserModal.tsx` |
+| Module type files    | PascalCase                  | `User.ts`, `CreateUserRequest.ts`       |
+| Other files          | kebab-case                  | `use-user-profile.ts`, `auth-api.ts`    |
+| Component exports    | PascalCase                  | `UserProfile`                           |
+| Hooks                | camelCase with `use` prefix | `useUserProfile`, `useUsers.ts`         |
+| Types                | PascalCase                  | `User`, `CreateUserRequest`             |
+| Validators           | camelCase                   | `signinValidator`                       |
+| API files            | camelCase + API             | `usersAPI.ts`                           |
+| Constants files      | kebab-case                  | `query-keys.ts`                         |
+
+## Import Order (Enforced by ESLint)
+
+Imports MUST follow this exact order:
+
+```typescript
+// 1. React and external libraries
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { z } from 'zod';
+
+// 2. Internal modules (@/modules/*)
+import { useUsers } from '@/modules/users';
+import { Role } from '@/modules/auth';
+
+// 3. Components (@/components/*)
+import { DataTable } from '@/components/application/data-table/data-table';
+import { Button } from '@/components/base/buttons/button';
+
+// 4. Other internal imports (@/*)
+import { usePageMetadata } from '@/libs/usePageMetadata';
+import { cx } from '@/utils/cx';
+
+// 5. Relative imports (../ and ./)
+import { usePostsFilters } from '../libs';
+import type { Post } from '../types';
+```
+
+## Type Conventions
+
+- Use `type` for object shapes and unions:
+
+  ```typescript
+  type User = { id: string; name: string };
+  type Status = 'active' | 'inactive';
+  ```
+
+- Use `interface` for component props (enables declaration merging):
+
+  ```typescript
+  interface ButtonProps {
+    children: ReactNode;
+    onClick?: () => void;
+  }
+  ```
+
+- Request/Response types use PascalCase with suffix:
+
+  ```typescript
+  type CreateUserRequest = { ... };
+  type UpdateUserRequest = { ... };
+  type UsersResponse = PaginatedResponse<User>;
+  ```
+
+- Filter types extend `BaseTableFilters`:
+  ```typescript
+  interface UsersFilters extends BaseTableFilters {
+    search: string;
+    role: Role | '';
+  }
+  ```
+
+## Module Structure
+
+Each module follows this layered architecture:
+
+```
+modules/[module-name]/
+├── api/
+│   └── [module]API.ts        # API endpoint functions
+├── constants/
+│   ├── query-keys.ts         # Query key factory
+│   └── index.ts              # Constants exports
+├── libs/
+│   ├── use[Module]Filters.ts # Table filter hooks
+│   └── index.ts              # Libs exports
+├── services/
+│   └── use[Action].ts        # TanStack Query hooks
+├── types/
+│   ├── [TypeName].ts         # Individual type files (PascalCase)
+│   └── index.ts              # Types exports
+├── ui/
+│   ├── [Module]Table.tsx     # Table component
+│   ├── [Module]Filters.tsx   # Filters component
+│   ├── Create[Entity]Modal.tsx
+│   ├── Edit[Entity]Modal.tsx
+│   ├── Delete[Entity]Dialog.tsx
+│   └── index.ts              # UI exports
+└── index.ts                  # Public module exports
+```
+
+## Decision Rules
+
+### When to use Module Generator (`pnpm generate:module`)
+
+- Creating a new CRUD resource with list/create/edit/delete
+- Standard REST API endpoints
+- Needs table, filters, and modals
+
+### When to create manually
+
+- Non-CRUD features (auth, settings, dashboards)
+- Custom UI patterns
+- Complex business logic
+
+### When to use factories
+
+- `createCrudAPI` → Standard REST endpoints (GET, POST, PUT, DELETE)
+- `createQueryKeys` → Any module with React Query
+- `useTableFilters` → Any paginated list with URL-synced filters
+
+### When to add to common module
+
+- Utility is used by 2+ modules
+- Generic enough to be reusable
+- Not tied to specific business logic
+
+## Component Patterns
+
+### Page Component Structure
+
+```typescript
+export const EntityPage = () => {
+  // 1. Page metadata (ALWAYS include)
+  usePageMetadata({ title: "Entities" });
+
+  // 2. State for modals
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editing, setEditing] = useState<Entity | null>(null);
+  const [deleting, setDeleting] = useState<Entity | null>(null);
+
+  // 3. Render
+  return (
+    <PageWrapper>
+      <PageHeader>...</PageHeader>
+      <PageContent>
+        <QueryErrorBoundary>
+          <EntityTable onEdit={setEditing} onDelete={setDeleting} />
+        </QueryErrorBoundary>
+        <CreateEntityModal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} />
+        <EditEntityModal user={editing} isOpen={!!editing} onClose={() => setEditing(null)} />
+        <DeleteEntityDialog user={deleting} isOpen={!!deleting} onClose={() => setDeleting(null)} />
+      </PageContent>
+    </PageWrapper>
+  );
+};
+```
+
+### Table Component Structure
+
+```typescript
+export const EntityTable = ({ onEdit, onDelete }: Props) => {
+  // 1. Filters hook
+  const { filters, setPage, setSearch, hasActiveFilters } = useEntityFilters();
+
+  // 2. Data fetching
+  const { data, isLoading } = useEntities(filters);
+
+  // 3. Column definitions (memoized if needed)
+  const columns = useMemo(() => [...], [onEdit, onDelete]);
+
+  // 4. Render DataTable
+  return <DataTable ... />;
+};
+```
+
+### Modal Component Structure
+
+```typescript
+export const CreateEntityModal = ({ isOpen, onClose }: Props) => {
+  // 1. Mutation hook
+  const { mutate, isPending } = useCreateEntity();
+
+  // 2. Form setup
+  const { control, handleSubmit, reset } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { ... }
+  });
+
+  // 3. Submit handler
+  const onSubmit = (data: FormData) => {
+    mutate(data, {
+      onSuccess: () => {
+        reset();
+        onClose();
+      },
+    });
+  };
+
+  // 4. Render modal with form
+  return (
+    <DialogTrigger isOpen={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <ModalOverlay isDismissable>
+        <Modal className="max-w-md">
+          <Dialog>
+            <form onSubmit={handleSubmit(onSubmit)}>...</form>
+          </Dialog>
+        </Modal>
+      </ModalOverlay>
+    </DialogTrigger>
+  );
+};
+```
+
+## API & Data Fetching Patterns
+
+### Query Keys
+
+- ALWAYS use query key factories from `constants/query-keys.ts`
+- NEVER define query keys inline
+- Use `createQueryKeys` factory from `@/modules/common` when possible
+
+```typescript
+// ✅ Correct
+import { userQueryKeys } from '../constants';
+useQuery({ queryKey: userQueryKeys.list(params) });
+
+// ❌ Wrong
+useQuery({ queryKey: ['users', 'list'] });
+```
+
+### API Layer
+
+- NEVER use axios directly in components
+- ALWAYS use module API layer
+- Use `createCrudAPI` factory for standard REST endpoints
+
+```typescript
+// ✅ Correct
+import { usersAPI } from '../api/usersAPI';
+const data = await usersAPI.getUsers();
+
+// ❌ Wrong
+const data = await axiosInstance.get('/users');
+```
+
+### Service Hooks
+
+- ALWAYS use service hooks (React Query) for data fetching
+- NEVER mix API calls with UI logic
+
+```typescript
+// ✅ Correct
+const { data, isLoading } = useUsers(filters);
+
+// ❌ Wrong
+const Component = () => {
+  const response = await axiosInstance.get('/users');
+};
+```
+
+### Error Handling
+
+- ALWAYS use `getErrorMessage` from `@/modules/common` for consistent error messages
+- NEVER use generic error messages
+
+```typescript
+// ✅ Correct
+import { getErrorMessage } from '@/modules/common';
+onError: (error: unknown) => {
+  toast.error(getErrorMessage(error, 'Failed to create user'));
+};
+
+// ❌ Wrong
+onError: () => {
+  toast.error('Failed to create user');
+};
+```
+
+## Mutation Patterns
+
+- Use mutation factories from `@/modules/common` when possible
+- ALWAYS invalidate relevant query keys on success
+- ALWAYS show toast notifications
+- Use `getErrorMessage` for error handling
+
+```typescript
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: CreateUserRequest) => usersAPI.createUser(data),
+    onSuccess: () => {
+      toast.success('User created successfully');
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.lists() });
+    },
+    onError: (error: unknown) => {
+      toast.error(getErrorMessage(error, 'Failed to create user'));
+    },
+  });
+};
+```
+
+## Route Configuration
+
+- Routes are defined in `src/routes/index.tsx` using `createBrowserRouter`
+- Use route guards appropriately:
+  - `AuthGuard` - for protected routes
+  - `GuestGuard` - for auth pages
+  - `EmailVerifiedGuard` - for verified-only content
+  - `RoleGuard` - for role-based access
+
+```typescript
+{
+  path: "users",
+  element: (
+    <RoleGuard minimumRole={Role.Admin} pageLevel>
+      <UsersPage />
+    </RoleGuard>
+  ),
+}
+```
+
+## Role-based Access Control
+
+- ALWAYS use `Role` enum, never hardcode strings
+- Use `useRole` hook for permission checks
+- Use `ROLE_LABELS` and `ROLE_BADGE_COLORS` for UI
+
+```typescript
+// ✅ Correct
+import { Role, useRole, ROLE_LABELS, ROLE_BADGE_COLORS } from "@/modules/auth";
+const { isAtLeast } = useRole();
+if (isAtLeast(Role.Admin)) { ... }
+
+// ❌ Wrong
+if (user.role === "admin") { ... }
+```
+
+## Validation
+
+- Validators use Zod and are in `src/libs/validators/`
+- Use React Hook Form with `zodResolver`
+- Export both validator and inferred type
+
+```typescript
+export const createPostValidator = z.object({
+  title: z.string().min(1, 'Title is required'),
+  content: z.string().min(1, 'Content is required'),
+});
+
+export type CreatePostFormData = z.infer<typeof createPostValidator>;
+```
+
+## React Hook Form
+
+- Use RHF-adapted components from `@/components/base/_rhf/`
+- Available: `RHFInput`, `RHFPasswordInput`, `RHFTextarea`, `RHFCheckbox`
+- Always use `zodResolver` with Zod schemas
+
+## Error Boundaries
+
+- ALWAYS wrap data-fetching components with `QueryErrorBoundary`
+- Use `ErrorBoundary` for general React errors
+
+```typescript
+<QueryErrorBoundary>
+  <UsersTable />
+</QueryErrorBoundary>
+```
+
+## Page Metadata
+
+- ALWAYS set page title using `usePageMetadata` hook
+- Include description when appropriate
+
+```typescript
+export const UsersPage = () => {
+  usePageMetadata({
+    title: 'Users',
+    description: 'Manage system users', // optional
+  });
+  // ...
+};
+```
+
+## File Organization
+
+- Keep files within module structure
+- NEVER create helper files outside modules
+- Use barrel exports (`index.ts`) for clean imports
+
+```typescript
+// ✅ Correct
+src / modules / users / libs / userHelpers.ts;
+
+// ❌ Wrong
+src / helpers / userHelpers.ts;
+```
+
+## Code Style
+
+- Prefer editing existing files over creating new ones
+- Keep components focused and single-purpose
+- Use TypeScript strict mode
+- Run `pnpm lint` before committing
+- Always use type-safe patterns
+- **DO NOT write comments in code** - Code should be self-documenting through clear naming and structure
+
+## Axios Instances
+
+- Use `axiosInstance` (default) for authenticated requests
+- Use `authAxiosInstance` for auth endpoints (login, register)
+- NEVER create new axios instances
+
+## Environment Variables
+
+- Add to schema in `src/libs/env.ts`
+- Add to `.env.example`
+- Access via `env.VITE_*` (type-safe, validated)
+
+## Common Utilities
+
+### Pagination
+
+- Use `PaginatedResponse<T>` and `PaginationMeta` from `@/modules/common`
+
+### Filters
+
+- Use `useTableFilters` hook for URL-synced filters
+- Extend `BaseTableFilters` for filter types
+
+### Query Keys
+
+- Use `createQueryKeys` factory for consistent patterns
+
+### CRUD API
+
+- Use `createCrudAPI` factory for standard REST endpoints
+
+## DO NOT
+
+1. ❌ Don't use axios directly in components
+2. ❌ Don't define query keys inline
+3. ❌ Don't create files outside module structure
+4. ❌ Don't mix API calls with UI logic
+5. ❌ Don't duplicate types
+6. ❌ Don't hardcode strings for roles
+7. ❌ Don't forget error boundaries for data fetching
+8. ❌ Don't skip page metadata
+9. ❌ Don't use generic error messages (use `getErrorMessage`)
+10. ❌ Don't create new axios instances
+11. ❌ Don't write comments in code - Code should be self-documenting
+
+## When Making Changes
+
+1. Check if module generator can be used first
+2. Follow existing patterns in similar modules
+3. Use factories from `@/modules/common` when applicable
+4. Ensure proper TypeScript types
+5. Add error handling with `getErrorMessage`
+6. Wrap data-fetching components with `QueryErrorBoundary`
+7. Set page metadata
+8. Follow import order
+9. Run `pnpm type-check` before committing
+10. Keep components focused and single-purpose

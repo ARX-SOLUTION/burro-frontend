@@ -31,17 +31,21 @@ jobs:
             curl -sSfI http://127.0.0.1:5173/ && break || sleep 1
           done
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+      - name: Install Playwright and browsers
+        run: |
+          pnpm add -D @playwright/test@latest
+          npx playwright install --with-deps
 
-      - name: Run E2E script
+      - name: Run Playwright tests
         env:
           BASE_URL: http://127.0.0.1:5173
         run: pnpm test:e2e
 
-      - name: Upload screenshots
+      - name: Upload screenshots and reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-screenshots
-          path: artifacts/
+          name: e2e-artifacts
+          path: |
+            artifacts/
+            playwright-report/

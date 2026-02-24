@@ -12,7 +12,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
-    "test:e2e": "node scripts/run-playwright.mjs",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:legacy": "node scripts/run-playwright.mjs",
     "generate:module": "node scripts/generate-module.cjs",
     "prepare": "husky"
   },

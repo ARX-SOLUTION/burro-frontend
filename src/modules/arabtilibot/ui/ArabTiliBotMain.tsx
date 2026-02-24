@@ -1,11 +1,15 @@
+import { useNavigate } from 'react-router-dom';
+
 import { Button } from '@/components/base/buttons/button';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const ArabTiliBotMain = () => {
   usePageMetadata({ title: 'Burro' });
 
+  const navigate = useNavigate();
+
   const handleStart = () => {
-    // TODO: start onboarding flow or navigate
+    navigate('/arab-tili/lessons');
   };
 
   return (

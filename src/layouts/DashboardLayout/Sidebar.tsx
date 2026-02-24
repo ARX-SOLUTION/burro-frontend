@@ -22,6 +22,11 @@ const navItems: (NavItemType | NavItemDividerType)[] = [
     icon: Users01,
   },
   {
+    label: 'Arab tili',
+    href: '/arab-tili',
+    icon: Home03,
+  },
+  {
     divider: true,
     label: 'Settings',
   },

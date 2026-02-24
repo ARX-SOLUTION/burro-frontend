@@ -12,6 +12,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "type-check": "tsc --noEmit",
+    "test:e2e": "playwright test --config=playwright.config.ts",
+    "test:e2e:legacy": "node scripts/run-playwright.mjs",
     "generate:module": "node scripts/generate-module.cjs",
     "prepare": "husky"
   },
@@ -56,6 +58,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^24.10.4",
     "@types/pluralize": "^0.0.33",
@@ -73,6 +76,7 @@
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.3.0",
+    "playwright": "^1.58.2",
     "prettier": "^3.7.4",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "typescript": "^5.9.3",

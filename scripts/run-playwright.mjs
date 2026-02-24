@@ -51,6 +51,41 @@ if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR, { recursive: true });
     process.exit(5);
   }
 
+  // Additional assertions: progress bar, module cards, CTA style
+  try {
+    const progressInner = page.locator('div[style*="width"]').first();
+    if ((await progressInner.count()) > 0) {
+      const pct = await progressInner.evaluate((el) => {
+        const w = window.getComputedStyle(el).width;
+        const parent = el.parentElement;
+        if (!parent) return null;
+        const pw = window.getComputedStyle(parent).width;
+        const nW = parseFloat(w);
+        const nPW = parseFloat(pw);
+        if (isFinite(nW) && isFinite(nPW) && nPW > 0) return Math.round((nW / nPW) * 100);
+        return null;
+      });
+      console.log('Progress percent (approx):', pct);
+    }
+  } catch (e) {
+    console.warn('Could not evaluate progress inner width', e?.message || e);
+  }
+
+  // Module card titles
+  await page.waitForTimeout(200);
+  const hasAlif = await page.getByText('Alif').count();
+  const hasSa = await page.getByText('Sa').count();
+  if (!hasAlif || !hasSa) {
+    console.error('Module card texts missing');
+    await browser.close();
+    process.exit(6);
+  }
+
+  // Check hero CTA background color
+  const heroCta = page.getByRole('button', { name: /Boshlash/i }).first();
+  const bg = await heroCta.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+  console.log('Hero CTA background:', bg);
+
   const afterPath = path.join(OUT_DIR, 'arabitilbot-lessons.png');
   await page.screenshot({ path: afterPath, fullPage: true });
   console.log('Saved', afterPath);

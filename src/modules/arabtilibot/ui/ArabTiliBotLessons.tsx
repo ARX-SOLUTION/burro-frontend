@@ -1,5 +1,6 @@
 import { Button } from '@/components/base/buttons/button';
 import { usePageMetadata } from '@/libs/usePageMetadata';
+import { useNavigate } from 'react-router-dom';
 
 // Figma asset constants (expire after ~7 days)
 const PLAY_ICON = 'https://www.figma.com/api/mcp/asset/5bcdc797-b751-4b59-96f5-3759f75e53d5';
@@ -8,6 +9,8 @@ const CIRCLE_ICON = 'https://www.figma.com/api/mcp/asset/9745aca0-df50-41f8-92b9
 
 export const ArabTiliBotLessons = () => {
   usePageMetadata({ title: 'Arab tili darslari' });
+
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,8 +49,9 @@ export const ArabTiliBotLessons = () => {
             <div className="mt-4">
               <Button
                 className="w-full rounded-[12px] bg-white py-3 font-semibold text-[#0D9488] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
-                onClick={() => {}}
+                onClick={() => navigate('/arab-tili/lesson/sa/play')}
                 iconLeading={<img src={PLAY_ICON} alt="play" className="h-4 w-4" />}
+                aria-label="Boshlash: Sa, Jim, Ha"
               >
                 Boshlash
               </Button>
@@ -96,14 +100,16 @@ export const ArabTiliBotLessons = () => {
               { title: 'Sa', desc: 'Sa, Jim, Ha', note: '6 min' },
               { title: 'Dal', desc: 'Dal, Zal, Ro', note: '8 min' },
             ].map((m) => (
-              <div
+              <Button
                 key={m.title}
-                className="max-w-[140px] min-w-[140px] rounded-lg border border-gray-100 bg-white p-4 shadow-sm"
+                onClick={() => navigate(`/arab-tili/lesson/${m.title.toLowerCase()}/play`)}
+                className="max-w-[140px] min-w-[140px] rounded-lg border border-gray-100 bg-white p-4 shadow-sm text-left"
+                aria-label={`Ochiladigan modul: ${m.title}`}
               >
                 <div className="text-xl font-semibold text-slate-900">{m.title}</div>
                 <div className="mt-2 text-sm text-gray-500">{m.desc}</div>
                 <div className="mt-3 text-xs text-gray-400">{m.note}</div>
-              </div>
+              </Button>
             ))}
           </div>
         </div>

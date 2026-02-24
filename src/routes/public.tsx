@@ -8,6 +8,9 @@ const NotFoundPage = lazy(() =>
 const ArabTiliBotPage = lazy(() =>
   import('@/pages/ArabTiliBotPage').then((m) => ({ default: m.ArabTiliBotPage })),
 );
+const ArabTiliBotLessonsPage = lazy(() =>
+  import('@/pages/ArabTiliBotLessonsPage').then((m) => ({ default: m.ArabTiliBotLessonsPage })),
+);
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -17,6 +20,10 @@ export const publicRoutes: RouteObject[] = [
   {
     path: 'arab-tili',
     element: <ArabTiliBotPage />,
+  },
+  {
+    path: 'arab-tili/lessons',
+    element: <ArabTiliBotLessonsPage />,
   },
   {
     path: '*',

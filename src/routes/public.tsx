@@ -1,12 +1,14 @@
 import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
 
+import { ARAB_TILI_ROUTE_PATHS } from '@/modules/arabtilibot/constants/routes';
+
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
-const ArabTiliBotPage = lazy(() =>
-  import('@/pages/ArabTiliBotPage').then((m) => ({ default: m.ArabTiliBotPage })),
+const ArabTiliBotWelcomePage = lazy(() =>
+  import('@/pages/ArabTiliBotWelcomePage').then((m) => ({ default: m.ArabTiliBotWelcomePage })),
 );
 const ArabTiliBotLessonsPage = lazy(() =>
   import('@/pages/ArabTiliBotLessonsPage').then((m) => ({ default: m.ArabTiliBotLessonsPage })),
@@ -45,23 +47,23 @@ export const publicRoutes: RouteObject[] = [
     element: <HomePage />,
   },
   {
-    path: 'arab-tili',
-    element: <ArabTiliBotPage />,
+    path: ARAB_TILI_ROUTE_PATHS.WELCOME,
+    element: <ArabTiliBotWelcomePage />,
   },
   {
-    path: 'arab-tili/lessons',
+    path: ARAB_TILI_ROUTE_PATHS.LESSONS,
     element: <ArabTiliBotLessonsPage />,
   },
   {
-    path: 'arab-tili/lesson',
+    path: ARAB_TILI_ROUTE_PATHS.LESSON,
     element: <ArabTiliBotLessonPage />,
   },
   {
-    path: 'arab-tili/lesson/:id',
+    path: ARAB_TILI_ROUTE_PATHS.LESSON_BY_ID,
     element: <ArabTiliBotLessonPage />,
   },
   {
-    path: 'arab-tili/lesson/:id/play',
+    path: ARAB_TILI_ROUTE_PATHS.LESSON_PLAY,
     element: <ArabTiliBotLessonPlayPage />,
   },
   {

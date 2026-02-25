@@ -90,4 +90,6 @@ import { QueryGenerator } from '@/utils/QueryGenerator';
 
 export const createQueryKeys = <TParams extends Record<string, unknown> = ListParams>(
   entity: string,
-) => new QueryGenerator<TParams>(entity);
+): QueryGenerator<TParams> => {
+  return new QueryGenerator<TParams>(entity);
+};

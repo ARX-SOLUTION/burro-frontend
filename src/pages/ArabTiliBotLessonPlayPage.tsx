@@ -10,6 +10,7 @@ import { getLessonById } from '@/modules/arabtilibot/data/lessons';
 import type { LessonPlayQuestion } from '@/modules/arabtilibot/types/question';
 import { LessonPlayHeader } from '@/modules/arabtilibot/ui/play/LessonPlayHeader';
 import { McqQuestion } from '@/modules/arabtilibot/ui/play/McqQuestion';
+import { ResultBanner } from '@/modules/arabtilibot/ui/play/ResultBanner';
 
 import { Button } from '@/components/base/buttons/button';
 import { usePageMetadata } from '@/libs/usePageMetadata';
@@ -43,9 +44,24 @@ export const ArabTiliBotLessonPlayPage = () => {
   const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(
     question.options[0]?.key ?? null,
   );
-  const [answered] = useState(false);
+  const [answered, setAnswered] = useState(true);
+  const [isCorrect, setIsCorrect] = useState(true);
 
   const canCheck = Boolean(selectedOptionKey) && !answered;
+  const showCorrectResult = answered && isCorrect;
+
+  const handlePrimaryAction = () => {
+    if (showCorrectResult) {
+      setAnswered(false);
+      setIsCorrect(false);
+      setSelectedOptionKey(question.options[0]?.key ?? null);
+      return;
+    }
+
+    const selectedOption = question.options.find((option) => option.key === selectedOptionKey);
+    setIsCorrect(Boolean(selectedOption?.correct));
+    setAnswered(true);
+  };
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -53,38 +69,61 @@ export const ArabTiliBotLessonPlayPage = () => {
         <LessonPlayHeader
           progressPercent={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.progressPercent}
           hearts={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.hearts}
-          xpText={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.xpText}
+          xpText={showCorrectResult ? '+10 XP' : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.xpText}
           closeAriaLabel={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.closeAriaLabel}
           onClose={() => navigate(-1)}
         />
 
-        <McqQuestion
-          question={question}
-          selectedOptionKey={selectedOptionKey}
-          onSelectOption={setSelectedOptionKey}
-        />
+        <div
+          className={
+            showCorrectResult
+              ? '[&>div>div:last-child>button:first-child]:border-utility-success-500 [&>div>div:last-child>button:first-child]:bg-utility-success-50 [&>div>div:last-child>button:first-child]:text-utility-success-500'
+              : ''
+          }
+        >
+          <McqQuestion
+            question={question}
+            selectedOptionKey={selectedOptionKey}
+            onSelectOption={(optionKey) => {
+              if (answered) {
+                return;
+              }
+
+              setSelectedOptionKey(optionKey);
+            }}
+          />
+        </div>
 
         <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
           <div className="w-full max-w-[448px] border-t border-gray-200 bg-white px-4 pt-4 pb-4">
-            <div className="mb-2">
-              <button
-                type="button"
-                className="flex size-10 items-center justify-center rounded-lg text-gray-400"
-                aria-label={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.helpAriaLabel}
-              >
-                <HelpCircle className="size-6" />
-              </button>
-            </div>
+            {showCorrectResult ? (
+              <div className="mb-4">
+                <ResultBanner title="To'g'ri!" />
+              </div>
+            ) : (
+              <div className="mb-2">
+                <button
+                  type="button"
+                  className="flex size-10 items-center justify-center rounded-lg text-gray-400"
+                  aria-label={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.helpAriaLabel}
+                >
+                  <HelpCircle className="size-6" />
+                </button>
+              </div>
+            )}
 
             <Button
-              isDisabled={!canCheck}
+              isDisabled={!showCorrectResult && !canCheck}
+              onClick={handlePrimaryAction}
               className={`w-full rounded-xl py-[14px] text-[18px] leading-7 font-bold ${
-                canCheck
-                  ? 'bg-teal-600 text-white hover:bg-teal-700 hover:text-white'
-                  : 'bg-gray-200 text-gray-400 hover:bg-gray-200 hover:text-gray-400'
+                showCorrectResult
+                  ? 'bg-utility-success-500 text-white hover:bg-utility-success-500 hover:text-white'
+                  : canCheck
+                    ? 'bg-teal-600 text-white hover:bg-teal-700 hover:text-white'
+                    : 'bg-gray-200 text-gray-400 hover:bg-gray-200 hover:text-gray-400'
               }`}
             >
-              {ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.checkLabel}
+              {showCorrectResult ? 'Davom etish' : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.checkLabel}
             </Button>
           </div>
         </div>

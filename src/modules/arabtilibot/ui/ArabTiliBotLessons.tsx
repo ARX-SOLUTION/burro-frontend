@@ -36,7 +36,7 @@ export const ArabTiliBotLessons = () => {
 
         {/* Hero card */}
         <div className="mb-4">
-          <div className="relative h-[212px] overflow-hidden rounded-[16px] bg-[#0D9488] p-5 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+          <div className="relative h-[212px] overflow-hidden rounded-[16px] bg-[#0D9488] p-5 shadow-[0px_12px_24px_-6px_rgba(13,148,136,0.18)] transition-transform duration-300 hover:-translate-y-1">
             <img
               src={CIRCLE_ICON}
               alt=""
@@ -50,12 +50,15 @@ export const ArabTiliBotLessons = () => {
             </div>
 
             <div className="mt-3 h-2 w-full rounded-full bg-white/20">
-              <div className="h-full rounded-full bg-white/80" style={{ width: '45%' }} />
+              <div
+                className="h-full rounded-full bg-white/80 shadow-inner"
+                style={{ width: '45%' }}
+              />
             </div>
 
             <div className="absolute right-5 bottom-5 left-5">
               <Button
-                className="flex w-full items-center justify-center gap-3 rounded-[12px] bg-white py-3 font-semibold text-[#0D9488] shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+                className="flex w-full transform items-center justify-center gap-3 rounded-[12px] bg-white py-3 font-semibold text-[#0D9488] shadow-lg transition-shadow duration-200 hover:-translate-y-0.5 hover:shadow-2xl"
                 onClick={() => navigate('/arab-tili/lesson/sa/play')}
                 iconLeading={<img src={PLAY_ICON} alt="play" className="h-4 w-4" />}
                 aria-label="Boshlash: Sa, Jim, Ha"

@@ -28,6 +28,11 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
 
+      - name: Install pnpm
+        run: |
+          echo "Installing pnpm ${PNPM_VERSION} globally"
+          npm install -g pnpm@${PNPM_VERSION} || npm install -g pnpm
+
       - name: 🏗 Setup pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -88,7 +93,7 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: 🏗 Build and push
+      - name: 🏗 Build and push`````~
         id: build
         uses: docker/build-push-action@v5
         with:

@@ -81,7 +81,9 @@ export const ArabTiliBotLessonPlayPage = () => {
     };
   }, [lesson]);
 
-  const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(null);
+  const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(
+    question.options[0]?.key ?? null,
+  );
   const answered = false;
 
   const canCheck = Boolean(selectedOptionKey) && !answered;

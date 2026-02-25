@@ -10,8 +10,8 @@ const NotFoundPage = lazy(() =>
 const ArabTiliBotWelcomePage = lazy(() =>
   import('@/pages/ArabTiliBotWelcomePage').then((m) => ({ default: m.ArabTiliBotWelcomePage })),
 );
-const ArabTiliBotLessonsPage = lazy(() =>
-  import('@/pages/ArabTiliBotLessonsPage').then((m) => ({ default: m.ArabTiliBotLessonsPage })),
+const ArabTiliBotHomePage = lazy(() =>
+  import('@/pages/ArabTiliBotHomePage').then((m) => ({ default: m.ArabTiliBotHomePage })),
 );
 const ArabTiliBotLessonPage = lazy(() =>
   import('@/pages/ArabTiliBotLessonPage').then((m) => ({ default: m.ArabTiliBotLessonPage })),
@@ -52,7 +52,7 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSONS,
-    element: <ArabTiliBotLessonsPage />,
+    element: <ArabTiliBotHomePage />,
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSON,

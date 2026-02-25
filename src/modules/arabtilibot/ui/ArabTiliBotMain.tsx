@@ -13,20 +13,19 @@ export const ArabTiliBotMain = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50">
-      <div className="flex flex-1 items-center justify-center px-6">
-        <div className="text-center">
+    <div className="min-h-screen bg-gray-50">
+      <div className="mx-auto flex min-h-screen w-full max-w-[448px] flex-col p-6">
+        <div className="flex flex-1 flex-col items-center justify-center py-[122px] text-center">
           <h1 className="text-[30px] leading-[36px] font-bold text-[#111827]">Burro</h1>
-          <p className="mx-auto mt-4 w-[254px] text-[18px] leading-[28px] text-[#6b7280]">
+          <p className="mt-4 w-[254px] text-[18px] leading-[28px] text-[#6b7280]">
             Arab tilini noldan boshlab, oson va qiziqarli o&apos;rganing.
           </p>
         </div>
-      </div>
 
-      <div className="sticky bottom-0 z-20 w-full bg-transparent py-6">
-        <div className="mx-auto max-w-[448px] px-4">
+        <div className="sticky bottom-0 z-20 bg-gray-50 pb-8">
           <Button
-            className="w-full rounded-[12px] bg-[#0D9488] py-4 font-semibold text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]"
+            color="tertiary"
+            className="w-full rounded-[12px] bg-[#0D9488] py-4 text-[18px] leading-[28px] font-bold text-white shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)] hover:bg-[#0B7E74] hover:text-white"
             onClick={handleStart}
           >
             Boshlash

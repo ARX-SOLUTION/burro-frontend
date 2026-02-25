@@ -22,16 +22,20 @@ jobs:
       - name: 📦 Checkout
         uses: actions/checkout@v4
 
-      - name: 🏗 Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
       - name: 🏗 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'pnpm'
+
+      - name: 🏗 Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: ℹ️ Note
+        run: |
+          echo "Node.js ${NODE_VERSION} and pnpm ${PNPM_VERSION} are configured."
 
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile

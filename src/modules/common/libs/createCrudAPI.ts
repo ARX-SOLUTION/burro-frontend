@@ -86,12 +86,8 @@ export const createCrudAPI = <
   };
 };
 
+import { QueryGenerator } from '@/utils/QueryGenerator';
+
 export const createQueryKeys = <TParams extends Record<string, unknown> = ListParams>(
   entity: string,
-) => ({
-  all: [entity] as const,
-  lists: () => [entity, 'list'] as const,
-  list: (params: TParams) => [entity, 'list', params] as const,
-  details: () => [entity, 'detail'] as const,
-  detail: (id: string) => [entity, 'detail', id] as const,
-});
+) => new QueryGenerator<TParams>(entity);

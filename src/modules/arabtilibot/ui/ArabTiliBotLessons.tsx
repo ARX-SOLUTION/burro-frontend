@@ -1,148 +1,201 @@
 import { useNavigate } from 'react-router-dom';
+import { BookOpen01, Home03, Lock01, Play, Trophy01, User01 } from '@untitledui/icons';
 
 import { Button } from '@/components/base/buttons/button';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
-// Figma asset constants (expire after ~7 days)
-const PLAY_ICON = 'https://www.figma.com/api/mcp/asset/4efc551c-21c0-4fa9-a1a6-d0a46588431c';
-const AVATAR_ICON = 'https://www.figma.com/api/mcp/asset/863856e1-3674-4192-bb15-2baf547e7d39';
-const CIRCLE_ICON = 'https://www.figma.com/api/mcp/asset/19f642a8-7002-4d47-b7a4-cb579394451e';
-const PLAY_ICON_DECOR = 'https://www.figma.com/api/mcp/asset/b00f17e2-1613-4c14-a4e7-ac962130a53e';
-const LOCK_ICON = 'https://www.figma.com/api/mcp/asset/cdd84db9-b83c-44fb-b38c-c9ca00def377';
+const dashboardModules = [
+  { id: 'alif', title: 'Alif', description: 'Alif, Ba, Ta', note: 'Tugallangan', locked: false },
+  { id: 'sa', title: 'Sa', description: 'Sa, Jim, Ha', note: '6 min', locked: false },
+  { id: 'dal', title: 'Dal', description: 'Dal, Zal, Ro', note: '8 min', locked: false },
+  { id: 'za', title: 'Za', description: 'Za, Sin, Shin', note: '10 min', locked: true },
+  { id: 'sod', title: 'Sod', description: 'Sod, Dod', note: '12 min', locked: true },
+];
 
 export const ArabTiliBotLessons = () => {
   usePageMetadata({ title: 'Arab tili darslari' });
 
   const navigate = useNavigate();
+  const handleStartLesson = () => navigate('/arab-tili/lesson/sa/play');
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-[448px] px-4 pb-24">
-        {/* Header */}
-        <div className="sticky top-0 z-20 -mx-4 mb-4 bg-transparent px-4 pt-4">
-          <div className="flex items-center justify-between rounded-lg bg-white px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-800">
-                <img src={AVATAR_ICON} alt="A" className="h-5 w-5" />
+    <div className="min-h-screen bg-gray-100">
+      <div className="mx-auto min-h-screen w-full max-w-[448px] bg-gray-50 shadow-[0px_25px_50px_-12px_rgba(0,0,0,0.25)]">
+        <div className="sticky top-0 z-20 bg-white px-4 py-3 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="flex size-8 items-center justify-center rounded-full bg-[#ccfbf1] text-[16px] leading-[24px] font-bold text-[#0f766e]">
+                A
               </div>
               <div>
-                <div className="text-sm font-semibold text-slate-800">Salom, Azizbek 👋</div>
-                <div className="text-xs text-yellow-500">★ 5 kun streak</div>
+                <p className="text-[14px] leading-[20px] font-bold text-[#1f2937]">
+                  Salom, Azizbek 👋
+                </p>
+                <p className="text-[12px] leading-[16px] font-bold text-[#fbbf24]">
+                  🔥 5 kun streak
+                </p>
               </div>
             </div>
-            <div className="rounded-full bg-slate-100 px-3 py-1 text-xs">🇬🇧 EN</div>
+            <div className="rounded-full bg-[#f3f4f6] px-3 py-1 text-[12px] leading-[16px] font-bold text-[#4b5563]">
+              🇬🇧 EN
+            </div>
           </div>
         </div>
 
-        {/* Hero card */}
-        <div className="mb-4">
-          <div className="relative h-[212px] overflow-hidden rounded-[16px] bg-[#0D9488] p-5 shadow-[0px_12px_24px_-6px_rgba(13,148,136,0.18)] transition-transform duration-300 hover:-translate-y-1">
-            <img
-              src={CIRCLE_ICON}
-              alt=""
-              className="absolute -top-8 -right-8 h-36 w-36 opacity-10"
-            />
-            <div className="text-sm text-white opacity-95">Davom etish</div>
-            <div className="mt-3 text-2xl font-bold text-white">Sa, Jim, Ha</div>
-            <div className="mt-4 flex items-center justify-between text-sm text-white/90">
-              <div>4 / 10 savol</div>
-              <div>~6 min</div>
-            </div>
+        <div className="space-y-6 px-4 py-4 pb-28">
+          <div className="relative h-[212px] overflow-hidden rounded-2xl bg-[#0D9488] p-5 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.1),0px_4px_6px_-4px_rgba(0,0,0,0.1)]">
+            <div className="absolute -top-10 -right-10 size-32 rounded-full bg-white/5" />
+            <p className="text-[14px] leading-[20px] font-semibold text-white/90">Davom etish</p>
+            <p className="mt-1 text-[24px] leading-[32px] font-bold text-white">Sa, Jim, Ha</p>
 
-            <div className="mt-3 h-2 w-full rounded-full bg-white/20">
-              <div
-                className="h-full rounded-full bg-white/80 shadow-inner"
-                style={{ width: '45%' }}
-              />
+            <div className="mt-3 flex items-center justify-between text-[14px] leading-[20px] text-white/90">
+              <p>4 / 10 savol</p>
+              <p>~6 min</p>
             </div>
-
-            <div className="absolute right-5 bottom-5 left-5">
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/20">
+              <div className="h-full w-2/5 bg-white/90" />
+            </div>
+            <div className="mt-4">
               <Button
-                className="flex w-full transform items-center justify-center gap-3 rounded-[12px] bg-white py-3 font-semibold text-[#0D9488] shadow-lg transition-shadow duration-200 hover:-translate-y-0.5 hover:shadow-2xl"
-                onClick={() => navigate('/arab-tili/lesson/sa/play')}
-                iconLeading={<img src={PLAY_ICON} alt="play" className="h-4 w-4" />}
-                aria-label="Boshlash: Sa, Jim, Ha"
+                color="tertiary"
+                className="w-full rounded-xl bg-white py-3 text-[18px] leading-[28px] font-bold text-[#0f766e] hover:bg-white hover:text-[#0f766e]"
+                onClick={handleStartLesson}
+                iconLeading={Play}
               >
-                <span className="sr-only">Play</span>
                 Boshlash
               </Button>
             </div>
           </div>
-        </div>
 
-        {/* Daily task card */}
-        <div className="relative mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <div className="text-xs font-semibold text-gray-400 uppercase">Kunlik vazifa</div>
-          <div className="mt-2 text-lg font-bold text-slate-800">10 ta savol yechin</div>
-          <div className="absolute top-4 right-4 flex h-8 items-center justify-center rounded-full border border-yellow-100 bg-yellow-50 px-3 text-sm text-yellow-600">
-            +20 XP
-          </div>
-        </div>
-
-        {/* Today's results */}
-        <div className="mb-4 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="text-lg font-bold text-slate-800">Bugungi natij</div>
-            <div className="text-sm font-semibold text-teal-600">Batafsil</div>
-          </div>
-          <div className="mt-4 flex gap-4">
-            <div className="flex-1 rounded-lg bg-gray-50 p-4 text-center">
-              <div className="text-xs text-gray-400">Vaqt</div>
-              <div className="mt-2 text-lg font-bold">180 min</div>
+          <div className="flex items-center justify-between rounded-2xl border border-[#f3f4f6] bg-white p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+            <div>
+              <p className="text-[12px] leading-[16px] font-bold text-[#9ca3af] uppercase">
+                Kunlik vazifa
+              </p>
+              <p className="mt-1 text-[16px] leading-[24px] font-bold text-[#1f2937]">
+                10 ta savol yechin
+              </p>
             </div>
-            <div className="flex-1 rounded-lg bg-gray-50 p-4 text-center">
-              <div className="text-xs text-gray-400">XP</div>
-              <div className="mt-2 text-lg font-bold">1240</div>
+            <div className="rounded-full border border-[#fbbf2433] bg-[#fbbf241a] px-3 py-1 text-[12px] leading-[16px] font-bold text-[#fbbf24]">
+              +20 XP
             </div>
           </div>
-        </div>
 
-        {/* Modules header */}
-        <div className="mb-3 flex items-center justify-between">
-          <div className="text-lg font-bold text-slate-800">Modullar</div>
-          <div className="text-sm text-teal-600">Barchasi</div>
-        </div>
-
-        {/* Modules horizontal scroll */}
-        <div className="-mx-4 mb-20 overflow-x-auto px-4">
-          <div className="flex gap-4">
-            {[
-              { title: 'Alif', desc: 'Alif, Ba, Ta', note: 'Tugallangan', locked: false },
-              { title: 'Sa', desc: 'Sa, Jim, Ha', note: '6 min', locked: false },
-              { title: 'Dal', desc: 'Dal, Zal, Ro', note: '8 min', locked: false },
-              { title: 'Za', desc: 'Za, Sin, Shin', note: '10 min', locked: true },
-              { title: 'Sod', desc: 'Sod, Dod', note: '12 min', locked: true },
-            ].map((m) => (
-              <div key={m.title} className="relative">
-                <Button
-                  onClick={() => navigate(`/arab-tili/lesson/${m.title.toLowerCase()}/play`)}
-                  className={`max-w-[140px] min-w-[140px] rounded-lg border border-gray-100 ${m.locked ? 'bg-[#f9fafb]' : 'bg-white'} p-4 text-left shadow-sm`}
-                  aria-label={`Ochiladigan modul: ${m.title}`}
-                >
-                  <div className="text-xl font-semibold text-slate-900">{m.title}</div>
-                  <div className="mt-2 text-sm text-gray-500">{m.desc}</div>
-                  <div className="mt-3 text-xs text-gray-400">{m.note}</div>
-                </Button>
-                {m.locked && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-[rgba(243,244,246,0.5)]">
-                    <img src={LOCK_ICON} alt="locked" className="h-6 w-6 opacity-90" />
-                  </div>
-                )}
+          <div className="rounded-2xl border border-[#f3f4f6] bg-white p-4 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between">
+              <p className="text-[16px] leading-[24px] font-bold text-[#1f2937]">Bugungi natij</p>
+              <button
+                type="button"
+                className="text-[12px] leading-[16px] font-bold text-[#0D9488]"
+                aria-label="Bugungi natija batafsil"
+              >
+                Batafsil
+              </button>
+            </div>
+            <div className="mt-4 grid grid-cols-2 gap-4">
+              <div className="rounded-xl bg-[#f9fafb] p-3">
+                <p className="text-[12px] leading-[16px] text-[#9ca3af]">Vaqt</p>
+                <p className="mt-1 text-[18px] leading-[28px] font-bold text-[#1f2937]">180 min</p>
               </div>
-            ))}
+              <div className="rounded-xl bg-[#f9fafb] p-3">
+                <p className="text-[12px] leading-[16px] text-[#9ca3af]">XP</p>
+                <p className="mt-1 text-[18px] leading-[28px] font-bold text-[#1f2937]">1240</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-[16px] leading-[24px] font-bold text-[#1f2937]">Modullar</p>
+              <button
+                type="button"
+                className="text-[12px] leading-[16px] font-bold text-[#0D9488]"
+                onClick={() => navigate('/arab-tili/lesson')}
+              >
+                Barchasi
+              </button>
+            </div>
+            <div className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex gap-3 pb-1">
+                {dashboardModules.map((module) => (
+                  <button
+                    key={module.title}
+                    type="button"
+                    disabled={module.locked}
+                    onClick={() => navigate(`/arab-tili/lesson/${module.id}/play`)}
+                    className={`relative h-32 w-36 min-w-36 rounded-xl border border-[#e5e7eb] p-4 text-left ${
+                      module.locked
+                        ? 'bg-[#f9fafb]'
+                        : 'bg-white shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]'
+                    }`}
+                  >
+                    <p className="text-[30px] leading-[36px] font-bold text-[#1f2937]">
+                      {module.title}
+                    </p>
+                    <p className="mt-2 text-[12px] leading-[16px] text-[#6b7280]">
+                      {module.description}
+                    </p>
+                    <p className="mt-1 text-[10px] leading-[15px] font-bold text-[#9ca3af]">
+                      {module.note}
+                    </p>
+                    {module.locked && (
+                      <span className="absolute inset-0 flex items-center justify-center rounded-xl bg-[#f3f4f680]">
+                        <Lock01 className="size-6 text-[#6b7280]" />
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Floating center play button (mimics bottom nav play in Figma) */}
-        <div className="pointer-events-none fixed right-0 bottom-6 left-0 z-30 flex justify-center">
-          <div className="pointer-events-auto">
-            <Button
-              onClick={() => navigate('/arab-tili/lesson/sa/play')}
-              className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0D9488] p-0 shadow-[0px_10px_15px_-3px_rgba(0,0,0,0.12)]"
-              aria-label="O'rtadagi Boshlash"
-            >
-              <img src={PLAY_ICON_DECOR} alt="play" className="h-6 w-6 text-white" />
-            </Button>
+        <div className="fixed inset-x-0 bottom-0 z-30 flex justify-center">
+          <div className="relative w-full max-w-[448px] border-t border-[#e5e7eb] bg-white">
+            <div className="grid h-16 grid-cols-5 items-center px-4">
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-1 text-[#0D9488]"
+                onClick={() => navigate('/arab-tili/lessons')}
+              >
+                <Home03 className="size-6" />
+                <span className="text-[10px] leading-[15px]">Home</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-1 text-[#9ca3af]"
+                onClick={() => navigate('/arab-tili/lesson')}
+              >
+                <BookOpen01 className="size-6" />
+                <span className="text-[10px] leading-[15px]">Modullar</span>
+              </button>
+              <div />
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-1 text-[#9ca3af]"
+              >
+                <Trophy01 className="size-6" />
+                <span className="text-[10px] leading-[15px]">Reyting</span>
+              </button>
+              <button
+                type="button"
+                className="flex flex-col items-center justify-center gap-1 text-[#9ca3af]"
+              >
+                <User01 className="size-6" />
+                <span className="text-[10px] leading-[15px]">Profil</span>
+              </button>
+            </div>
+
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <Button
+                color="tertiary"
+                className="size-16 rounded-full border-4 border-[#f3f4f6] bg-[#0D9488] p-0 text-white hover:bg-[#0D9488] hover:text-white"
+                onClick={handleStartLesson}
+                aria-label="Darsni boshlash"
+              >
+                <Play className="size-7 text-white" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

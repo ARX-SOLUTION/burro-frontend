@@ -43,11 +43,25 @@ jobs:
         run: |
           echo "Node.js ${NODE_VERSION} and pnpm ${PNPM_VERSION} are configured."
 
-      - name: ✅ Verify pnpm
+      - name: ✅ Ensure pnpm is on PATH
         run: |
           echo "node: $(node --version)"
-          pnpm --version || (echo 'pnpm not found' && exit 1)
-          echo "which pnpm: $(which pnpm || echo 'none')"
+          echo "npm: $(npm --version)"
+          echo "Current PATH: $PATH"
+          if command -v pnpm >/dev/null 2>&1; then
+            echo "pnpm found: $(pnpm --version)"
+            echo "which pnpm: $(which pnpm)"
+          else
+            echo "pnpm not found on PATH, attempting to install globally"
+            npm install -g pnpm@${{ env.PNPM_VERSION }} || npm install -g pnpm
+            # ensure npm global bin is in PATH for this job
+            export PATH="$(npm bin -g):$PATH"
+            if command -v pnpm >/dev/null 2>&1; then
+              echo "pnpm installed: $(pnpm --version)"
+            else
+              echo 'pnpm still not found after install' && exit 1
+            fi
+          fi
 
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile

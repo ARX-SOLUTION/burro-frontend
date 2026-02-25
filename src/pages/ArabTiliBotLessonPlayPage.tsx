@@ -42,19 +42,22 @@ export const ArabTiliBotLessonPlayPage = () => {
   }, [lesson]);
 
   const [selectedOptionKey, setSelectedOptionKey] = useState<string | null>(
-    question.options[0]?.key ?? null,
+    question.options[2]?.key ?? question.options[0]?.key ?? null,
   );
   const [answered, setAnswered] = useState(true);
-  const [isCorrect, setIsCorrect] = useState(true);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const canCheck = Boolean(selectedOptionKey) && !answered;
   const showCorrectResult = answered && isCorrect;
+  const showWrongResult = answered && !isCorrect;
+  const correctAnswerLabel =
+    question.options.find((option) => option.correct)?.label ?? question.options[0]?.label;
 
   const handlePrimaryAction = () => {
-    if (showCorrectResult) {
+    if (showCorrectResult || showWrongResult) {
       setAnswered(false);
       setIsCorrect(false);
-      setSelectedOptionKey(question.options[0]?.key ?? null);
+      setSelectedOptionKey(question.options[2]?.key ?? question.options[0]?.key ?? null);
       return;
     }
 
@@ -68,7 +71,7 @@ export const ArabTiliBotLessonPlayPage = () => {
       <div className="mx-auto min-h-screen w-full max-w-[448px] bg-gray-50 shadow-2xl">
         <LessonPlayHeader
           progressPercent={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.progressPercent}
-          hearts={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.hearts}
+          hearts={showWrongResult ? 2 : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.hearts}
           xpText={showCorrectResult ? '+10 XP' : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.xpText}
           closeAriaLabel={ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.closeAriaLabel}
           onClose={() => navigate(-1)}
@@ -78,7 +81,9 @@ export const ArabTiliBotLessonPlayPage = () => {
           className={
             showCorrectResult
               ? '[&>div>div:last-child>button:first-child]:border-utility-success-500 [&>div>div:last-child>button:first-child]:bg-utility-success-50 [&>div>div:last-child>button:first-child]:text-utility-success-500'
-              : ''
+              : showWrongResult
+                ? '[&>div>div:last-child>button.bg-teal-50]:bg-error-50 [&>div>div:last-child>button.border-teal-500]:border-error-500 [&>div>div:last-child>button.text-teal-700]:text-error-500 [&>div>div:last-child>button:first-child]:border-utility-success-500 [&>div>div:last-child>button:first-child]:bg-utility-success-50 [&>div>div:last-child>button:first-child]:text-utility-success-500'
+                : ''
           }
         >
           <McqQuestion
@@ -100,6 +105,15 @@ export const ArabTiliBotLessonPlayPage = () => {
               <div className="mb-4">
                 <ResultBanner title="To'g'ri!" />
               </div>
+            ) : showWrongResult ? (
+              <div className="mb-4">
+                <ResultBanner
+                  variant="error"
+                  title="Noto'g'ri"
+                  descriptionPrefix="To'g'ri javob:"
+                  descriptionValue={correctAnswerLabel}
+                />
+              </div>
             ) : (
               <div className="mb-2">
                 <button
@@ -113,17 +127,21 @@ export const ArabTiliBotLessonPlayPage = () => {
             )}
 
             <Button
-              isDisabled={!showCorrectResult && !canCheck}
+              isDisabled={!showCorrectResult && !showWrongResult && !canCheck}
               onClick={handlePrimaryAction}
               className={`w-full rounded-xl py-[14px] text-[18px] leading-7 font-bold ${
                 showCorrectResult
                   ? 'bg-utility-success-500 text-white hover:bg-utility-success-500 hover:text-white'
-                  : canCheck
-                    ? 'bg-teal-600 text-white hover:bg-teal-700 hover:text-white'
-                    : 'bg-gray-200 text-gray-400 hover:bg-gray-200 hover:text-gray-400'
+                  : showWrongResult
+                    ? 'bg-error-500 text-white hover:bg-error-500 hover:text-white'
+                    : canCheck
+                      ? 'bg-teal-600 text-white hover:bg-teal-700 hover:text-white'
+                      : 'bg-gray-200 text-gray-400 hover:bg-gray-200 hover:text-gray-400'
               }`}
             >
-              {showCorrectResult ? 'Davom etish' : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.checkLabel}
+              {showCorrectResult || showWrongResult
+                ? 'Davom etish'
+                : ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA.checkLabel}
             </Button>
           </div>
         </div>

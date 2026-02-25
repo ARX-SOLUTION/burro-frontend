@@ -14,7 +14,7 @@ export const McqQuestion = ({ question, selectedOptionKey, onSelectOption }: Mcq
         {question.prompt}
       </h1>
 
-      <div className="py-[61px] text-center">
+      <div className="py-[61.2px] text-center">
         <p className="text-[128px] leading-[128px] font-bold text-teal-600">{question.letter}</p>
       </div>
 

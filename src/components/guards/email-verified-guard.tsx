@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { useAuth } from '@/hooks/use-auth';
 
@@ -8,9 +8,13 @@ type EmailVerifiedGuardProps = {
 
 export const EmailVerifiedGuard = ({ children }: EmailVerifiedGuardProps) => {
   const { user } = useAuth();
+  const location = useLocation();
 
   if (user && !user.emailVerified) {
-    return <Navigate to="/auth/verify-email" replace />;
+    const redirectUrl = `${location.pathname}${location.search}`;
+    return (
+      <Navigate to={`/auth/verify-email?redirect=${encodeURIComponent(redirectUrl)}`} replace />
+    );
   }
 
   return <>{children}</>;

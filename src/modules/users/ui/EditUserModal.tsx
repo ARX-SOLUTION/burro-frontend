@@ -22,7 +22,7 @@ type FormData = z.infer<typeof schema>;
 
 const ROLE_OPTIONS = [
   { id: Role.Admin, label: 'Admin' },
-  { id: Role.User, label: 'User' },
+  { id: Role.Student, label: 'Student' },
 ];
 
 interface EditUserModalProps {
@@ -42,7 +42,7 @@ export const EditUserModal = ({ user, isOpen, onClose }: EditUserModalProps) => 
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: '',
-      role: Role.User,
+      role: Role.Student,
     },
   });
 

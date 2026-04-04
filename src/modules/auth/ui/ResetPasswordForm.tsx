@@ -7,11 +7,13 @@ import { RHFPasswordInput } from '@/components/base/_rhf/rhf-password-input';
 import { Button } from '@/components/base/buttons/button';
 import { type ResetPasswordFormData, resetPasswordSchema } from '@/libs/validators';
 
+import { AUTH_SEARCH_PARAMS, buildAuthPathWithRedirect } from '../constants';
 import { useResetPasswordMutation } from '../services/useResetPasswordMutation';
 
 export const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
 
   const { mutate: resetPassword, isPending } = useResetPasswordMutation();
 
@@ -38,7 +40,7 @@ export const ResetPasswordForm = () => {
           Invalid or missing reset token. Please request a new password reset link.
         </p>
         <Link
-          to="/auth/forgot-password"
+          to={buildAuthPathWithRedirect('/auth/forgot-password', redirectUrl)}
           className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-brand-secondary hover:text-brand-secondary_hover"
         >
           Request new link
@@ -70,7 +72,7 @@ export const ResetPasswordForm = () => {
       </Button>
 
       <Link
-        to="/auth/login"
+        to={buildAuthPathWithRedirect('/auth/login', redirectUrl)}
         className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-brand-secondary hover:text-brand-secondary_hover"
       >
         <ArrowLeft className="size-5" />

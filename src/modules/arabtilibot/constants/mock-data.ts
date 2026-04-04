@@ -51,6 +51,48 @@ export const ARAB_TILI_HOME_DASHBOARD_MOCK_DATA: HomeDashboardData = {
   ],
 };
 
+export const BURRO_HOME_DASHBOARD_MOCK_DATA: HomeDashboardData = {
+  greeting: 'Salom, Azizbek!',
+  streak: '3 kun streak',
+  languageChip: 'UZ',
+  continueTitle: 'Davom etish',
+  continueLesson: 'Alif va Harflar',
+  continueCurrentStep: 2,
+  continueTotalSteps: 6,
+  continueEta: '5 min',
+  continueProgressPercent: 33,
+  continueLessonId: 'm1',
+  dailyTaskTitle: 'Kunlik vazifa',
+  dailyTaskValue: 'Bugun 2 ta savol yeching',
+  dailyTaskReward: '+15 XP',
+  todayTitle: 'Bugungi natija',
+  todayActionLabel: 'Batafsil',
+  todayStats: [
+    { label: 'Mashq vaqti', value: '12 min' },
+    { label: 'XP', value: '420' },
+  ],
+  modulesTitle: 'Modullar',
+  modulesActionLabel: 'Barchasi',
+  modules: [
+    {
+      id: 'module-m1',
+      title: 'Alif va Harflar',
+      description: "Boshlang'ich harflar",
+      statusLabel: '2 savol',
+      status: 'duration',
+      lessonId: 'm1',
+    },
+    {
+      id: 'module-m2',
+      title: "So'z qurilishi",
+      description: "So'zlar bilan mashq",
+      statusLabel: 'Yangi',
+      status: 'duration',
+      lessonId: 'm2',
+    },
+  ],
+};
+
 export const ARAB_TILI_LESSON_PLAY_UI_MOCK_DATA: LessonPlayUiState = {
   progressPercent: 33.33,
   hearts: 3,

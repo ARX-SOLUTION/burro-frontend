@@ -1,5 +1,7 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
+import { buildAuthPathWithRedirect } from '@/modules/auth';
+
 import { env } from '@/libs/env';
 import { tokenStorage } from '@/libs/storage';
 
@@ -82,7 +84,8 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         tokenStorage.clearTokens();
-        window.location.href = '/auth/login';
+        const redirectUrl = `${window.location.pathname}${window.location.search}`;
+        window.location.href = buildAuthPathWithRedirect('/auth/login', redirectUrl);
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

@@ -8,7 +8,11 @@ import { Button } from '@/components/base/buttons/button';
 import { useAuth } from '@/hooks/use-auth';
 import { type VerifyEmailFormData, verifyEmailSchema } from '@/libs/validators';
 
-import { AUTH_SEARCH_PARAMS, DEFAULT_AUTH_REDIRECT } from '../constants';
+import {
+  AUTH_SEARCH_PARAMS,
+  buildAuthPathWithRedirect,
+  getDefaultRedirectForRole,
+} from '../constants';
 import { useLogoutMutation } from '../services/useLogoutMutation';
 import { useResendVerificationMutation } from '../services/useResendVerificationMutation';
 import { useVerifyEmailMutation } from '../services/useVerifyEmailMutation';
@@ -19,8 +23,10 @@ export const VerifyEmailForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const tokenFromUrl = searchParams.get('token');
-  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT) || DEFAULT_AUTH_REDIRECT;
   const { user } = useAuth();
+  const redirectUrl =
+    searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT) || getDefaultRedirectForRole(user?.role);
+  const loginHref = buildAuthPathWithRedirect('/auth/login', redirectUrl);
 
   useEffect(() => {
     if (user?.emailVerified) {
@@ -134,7 +140,7 @@ export const VerifyEmailForm = () => {
           <Button
             color="link-color"
             size="sm"
-            href="/auth/login"
+            href={loginHref}
             onClick={() => logout()}
             isDisabled={isLoggingOut}
           >

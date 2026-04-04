@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft } from '@untitledui/icons';
 
@@ -7,10 +7,13 @@ import { RHFInput } from '@/components/base/_rhf/rhf-input';
 import { Button } from '@/components/base/buttons/button';
 import { type ForgotPasswordFormData, forgotPasswordSchema } from '@/libs/validators';
 
+import { AUTH_SEARCH_PARAMS, buildAuthPathWithRedirect } from '../constants';
 import { useForgotPasswordMutation } from '../services/useForgotPasswordMutation';
 
 export const ForgotPasswordForm = () => {
   const { mutate: forgotPassword, isPending, isSuccess } = useForgotPasswordMutation();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
 
   const { control, handleSubmit } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -31,7 +34,7 @@ export const ForgotPasswordForm = () => {
           check your inbox.
         </p>
         <Link
-          to="/auth/login"
+          to={buildAuthPathWithRedirect('/auth/login', redirectUrl)}
           className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-brand-secondary hover:text-brand-secondary_hover"
         >
           <ArrowLeft className="size-5" />
@@ -57,7 +60,7 @@ export const ForgotPasswordForm = () => {
       </Button>
 
       <Link
-        to="/auth/login"
+        to={buildAuthPathWithRedirect('/auth/login', redirectUrl)}
         className="inline-flex items-center justify-center gap-2 text-sm font-semibold text-brand-secondary hover:text-brand-secondary_hover"
       >
         <ArrowLeft className="size-5" />

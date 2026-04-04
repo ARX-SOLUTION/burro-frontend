@@ -1,27 +1,14 @@
 import { lazy } from 'react';
-import type { RouteObject } from 'react-router-dom';
+import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { ARAB_TILI_ROUTE_PATHS } from '@/modules/arabtilibot/constants/routes';
+
+import { AuthGuard, StudentGuard } from '@/components/guards';
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
-const ArabTiliBotWelcomePage = lazy(() =>
-  import('@/pages/ArabTiliBotWelcomePage').then((m) => ({ default: m.ArabTiliBotWelcomePage })),
-);
-const ArabTiliBotHomePage = lazy(() =>
-  import('@/pages/ArabTiliBotHomePage').then((m) => ({ default: m.ArabTiliBotHomePage })),
-);
-const ArabTiliBotLessonPage = lazy(() =>
-  import('@/pages/ArabTiliBotLessonPage').then((m) => ({ default: m.ArabTiliBotLessonPage })),
-);
-const ArabTiliBotLessonPlayPage = lazy(() =>
-  import('@/pages/ArabTiliBotLessonPlayPage').then((m) => ({
-    default: m.ArabTiliBotLessonPlayPage,
-  })),
-);
-
 const BurroWelcomePage = lazy(() =>
   import('@/pages/BurroWelcomePage').then((m) => ({ default: m.BurroWelcomePage })),
 );
@@ -48,23 +35,23 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.WELCOME,
-    element: <ArabTiliBotWelcomePage />,
+    element: <Navigate to="/burro/welcome" replace />,
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSONS,
-    element: <ArabTiliBotHomePage />,
+    element: <Navigate to="/burro" replace />,
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSON,
-    element: <ArabTiliBotLessonPage />,
+    element: <Navigate to="/burro/modules" replace />,
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSON_BY_ID,
-    element: <ArabTiliBotLessonPage />,
+    element: <Navigate to="/burro/modules" replace />,
   },
   {
     path: ARAB_TILI_ROUTE_PATHS.LESSON_PLAY,
-    element: <ArabTiliBotLessonPlayPage />,
+    element: <Navigate to="/burro/modules" replace />,
   },
   {
     path: 'burro/welcome',
@@ -72,23 +59,53 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: 'burro',
-    element: <BurroHomePage />,
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroHomePage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
   },
   {
     path: 'burro/modules',
-    element: <BurroModulePage />,
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroModulePage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
   },
   {
     path: 'burro/practice/:moduleId',
-    element: <BurroPracticePage />,
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroPracticePage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
   },
   {
     path: 'burro/profile',
-    element: <BurroProfilePage />,
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroProfilePage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
   },
   {
     path: 'burro/leaderboard',
-    element: <BurroLeaderboardPage />,
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroLeaderboardPage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
   },
   {
     path: '*',

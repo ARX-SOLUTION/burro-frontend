@@ -23,7 +23,7 @@ const navItems: (NavItemType | NavItemDividerType)[] = [
   },
   {
     label: 'Arab tili',
-    href: '/arab-tili',
+    href: '/burro',
     icon: Home03,
   },
   {

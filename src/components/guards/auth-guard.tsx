@@ -16,7 +16,8 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
+    const redirectUrl = `${location.pathname}${location.search}`;
+    return <Navigate to={`/auth/login?redirect=${encodeURIComponent(redirectUrl)}`} replace />;
   }
 
   return <>{children}</>;

@@ -3,13 +3,15 @@ export type DashboardStat = {
   value: string;
 };
 
+export type HomeModuleStatus = 'completed' | 'duration';
+
 export type HomeModule = {
   id: string;
   title: string;
   description: string;
-  note: string;
+  statusLabel: string;
+  status: HomeModuleStatus;
   lessonId: string;
-  isLocked: boolean;
 };
 
 export type HomeDashboardData = {

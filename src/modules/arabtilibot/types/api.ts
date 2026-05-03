@@ -1,4 +1,17 @@
 export type StudentLanguage = 'uz' | 'en' | 'ru';
+export type StatisticsChartPeriod = '7d' | '30d';
+
+export type UpdateStudentProfileRequest = {
+  full_name?: string;
+  language?: StudentLanguage;
+  notifications_enabled?: boolean;
+};
+
+export type StatisticsChartResponse = {
+  period: string;
+  labels: string[];
+  xp_data: number[];
+};
 
 export type StudentHomeResponse = {
   streak: number;

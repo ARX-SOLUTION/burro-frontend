@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { BookOpen01, Home03, Trophy01, User01 } from '@untitledui/icons';
+import { BarChart01, BookOpen01, Home03, User01 } from '@untitledui/icons';
 
 import PlayButton from './PlayButton';
 
@@ -7,7 +7,7 @@ export default function BottomNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const items = [
+  const leftItems = [
     { label: 'Home', to: '/burro', icon: Home03, active: pathname === '/burro' },
     {
       label: 'Modullar',
@@ -15,11 +15,14 @@ export default function BottomNav() {
       icon: BookOpen01,
       active: pathname.startsWith('/burro/modules'),
     },
+  ];
+
+  const rightItems = [
     {
-      label: 'Reyting',
-      to: '/burro/leaderboard',
-      icon: Trophy01,
-      active: pathname.startsWith('/burro/leaderboard'),
+      label: 'Statistika',
+      to: '/burro/statistics',
+      icon: BarChart01,
+      active: pathname.startsWith('/burro/statistics'),
     },
     {
       label: 'Profil',
@@ -37,7 +40,7 @@ export default function BottomNav() {
 
         <div className="relative mx-2 overflow-hidden rounded-[34px] border border-white/10 bg-[linear-gradient(180deg,rgba(34,52,128,0.96),rgba(24,47,141,0.98))] px-4 pb-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
           <div className="grid h-[98px] grid-cols-5 items-end">
-            {items.slice(0, 2).map(({ active, icon: Icon, label, to }) => (
+            {leftItems.map(({ active, icon: Icon, label, to }) => (
               <Link
                 key={label}
                 to={to}
@@ -55,7 +58,7 @@ export default function BottomNav() {
               </div>
             </div>
 
-            {items.slice(2).map(({ active, icon: Icon, label, to }) => (
+            {rightItems.map(({ active, icon: Icon, label, to }) => (
               <Link
                 key={label}
                 to={to}

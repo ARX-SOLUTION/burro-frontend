@@ -4,10 +4,18 @@ import { AnswerOptionButton } from '@/modules/arabtilibot/ui/play/AnswerOptionBu
 type McqQuestionProps = {
   question: LessonPlayQuestion;
   selectedOptionKey: string | null;
+  feedbackCorrectKey?: string | null;
+  isAnswered?: boolean;
   onSelectOption: (optionKey: string) => void;
 };
 
-export const McqQuestion = ({ question, selectedOptionKey, onSelectOption }: McqQuestionProps) => {
+export const McqQuestion = ({
+  question,
+  selectedOptionKey,
+  feedbackCorrectKey,
+  isAnswered,
+  onSelectOption,
+}: McqQuestionProps) => {
   return (
     <div className="px-6 pt-24 pb-36">
       <h1 className="text-center text-[20px] leading-7 font-semibold text-gray-700">
@@ -15,15 +23,22 @@ export const McqQuestion = ({ question, selectedOptionKey, onSelectOption }: Mcq
       </h1>
 
       <div className="py-[61.2px] text-center">
-        <p className="text-[128px] leading-[128px] font-bold text-teal-600">{question.letter}</p>
+        <p className="text-[128px] leading-[128px] font-bold text-gray-900">{question.letter}</p>
       </div>
 
-      <div className="space-y-3">
-        {question.options.slice(0, 3).map((option) => (
+      <div className="grid grid-cols-2 gap-2">
+        {question.options.slice(0, 4).map((option) => (
           <AnswerOptionButton
             key={option.key}
             label={option.label}
-            isSelected={selectedOptionKey === option.key}
+            isSelected={selectedOptionKey === option.key && !feedbackCorrectKey}
+            isCorrect={!!feedbackCorrectKey && option.key === feedbackCorrectKey}
+            isWrong={
+              !!feedbackCorrectKey &&
+              selectedOptionKey === option.key &&
+              option.key !== feedbackCorrectKey
+            }
+            isDisabled={!!isAnswered}
             onSelect={() => onSelectOption(option.key)}
           />
         ))}

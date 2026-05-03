@@ -8,11 +8,14 @@ import type {
   ModuleFilter,
   ModulesResponse,
   StartAttemptResponse,
+  StatisticsChartPeriod,
+  StatisticsChartResponse,
   StudentHomeResponse,
   StudentProfileResponse,
   StudentStatisticsResponse,
   SubmitAnswerRequest,
   SubmitAnswerResponse,
+  UpdateStudentProfileRequest,
 } from '../types/api';
 
 export const burroAPI = {
@@ -28,6 +31,20 @@ export const burroAPI = {
 
   getStudentStatistics: async (): Promise<StudentStatisticsResponse> => {
     const response = await axiosInstance.get('/student/profile/statistics');
+    return response.data;
+  },
+
+  updateStudentProfile: async (
+    data: UpdateStudentProfileRequest,
+  ): Promise<StudentProfileResponse> => {
+    const response = await axiosInstance.patch('/student/profile', data);
+    return response.data;
+  },
+
+  getStatisticsChart: async (period: StatisticsChartPeriod): Promise<StatisticsChartResponse> => {
+    const response = await axiosInstance.get('/student/profile/statistics/chart', {
+      params: { period },
+    });
     return response.data;
   },
 

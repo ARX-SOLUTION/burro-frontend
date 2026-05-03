@@ -7,12 +7,16 @@ import {
 } from '@/modules/arabtilibot/libs/mappers';
 import { useAttemptQuestions } from '@/modules/arabtilibot/services/useAttemptQuestions';
 import { useFinishAttempt } from '@/modules/arabtilibot/services/useFinishAttempt';
+import { useRestartAttempt } from '@/modules/arabtilibot/services/useRestartAttempt';
 import { useStartAttempt } from '@/modules/arabtilibot/services/useStartAttempt';
 import { useSubmitAnswer } from '@/modules/arabtilibot/services/useSubmitAnswer';
+import type { LessonPlayQuestion } from '@/modules/arabtilibot/types/question';
 import { getErrorMessage } from '@/modules/common';
 
-import OptionButton from './OptionButton';
-import QuestionCard from './QuestionCard';
+import { AudioQuestion } from './play/AudioQuestion';
+import { LessonPlayHeader } from './play/LessonPlayHeader';
+import { McqQuestion } from './play/McqQuestion';
+import { ResultBanner } from './play/ResultBanner';
 
 export default function PracticePlayer() {
   const { moduleId } = useParams() as { moduleId?: string };
@@ -57,6 +61,7 @@ export default function PracticePlayer() {
     error: finishError,
     reset: resetFinishAttempt,
   } = useFinishAttempt();
+  const { mutateAsync: restartAttempt, isPending: isRestarting } = useRestartAttempt();
 
   const questions = useMemo(
     () => (questionsResponse ? mapAttemptQuestionsToView(questionsResponse) : []),
@@ -202,42 +207,68 @@ export default function PracticePlayer() {
 
   if (finishSummary) {
     return (
-      <div className="p-4">
-        <div className="mx-auto max-w-md rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="text-xl font-semibold text-gray-900">{finishSummary.title}</h2>
-          <p className="mt-2 text-sm text-gray-500">Mashq muvaffaqiyatli yakunlandi.</p>
-
-          <div className="mt-5 grid grid-cols-2 gap-3">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 pb-8">
+        <div className="w-full max-w-md">
+          <ResultBanner
+            title={finishSummary.title}
+            descriptionPrefix="Aniqlik:"
+            descriptionValue={`${finishSummary.accuracyPct}%`}
+          />
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-gray-50 p-4">
+              <div className="text-xs text-gray-500">XP</div>
+              <div className="mt-1 text-lg font-semibold text-warning-600">
+                +{finishSummary.xpEarned}
+              </div>
+            </div>
             <div className="rounded-xl bg-gray-50 p-4">
               <div className="text-xs text-gray-500">Aniqlik</div>
               <div className="mt-1 text-lg font-semibold">{finishSummary.accuracyPct}%</div>
             </div>
             <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">XP</div>
-              <div className="mt-1 text-lg font-semibold">+{finishSummary.xpEarned}</div>
+              <div className="text-xs text-gray-500">Correct</div>
+              <div className="mt-1 text-lg font-semibold text-success-600">
+                {finishSummary.correctCount}
+              </div>
             </div>
             <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">To‘g‘ri javoblar</div>
-              <div className="mt-1 text-lg font-semibold">{finishSummary.correctCount}</div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">Xato javoblar</div>
-              <div className="mt-1 text-lg font-semibold">{finishSummary.wrongCount}</div>
+              <div className="text-xs text-gray-500">Xato</div>
+              <div className="mt-1 text-lg font-semibold text-error-500">
+                {finishSummary.wrongCount}
+              </div>
             </div>
           </div>
-
           <div className="mt-6 space-y-3">
             <button
               type="button"
               onClick={() => navigate('/burro')}
-              className="w-full rounded-lg bg-teal-600 py-3 font-semibold text-white"
+              className="w-full rounded-[28px] bg-teal-600 py-4 font-bold text-white"
             >
               Bosh sahifaga qaytish
             </button>
+            {moduleId && (
+              <button
+                type="button"
+                disabled={isRestarting}
+                onClick={() => {
+                  void restartAttempt(moduleId).then((response) => {
+                    setFinishSummary(null);
+                    setAttemptId(response.attempt_id);
+                    setIndex(0);
+                    setSelected(null);
+                    setFeedback(null);
+                    setAnsweredQuestionIds([]);
+                  });
+                }}
+                className="w-full rounded-[28px] bg-gray-100 py-4 font-bold text-gray-700 disabled:opacity-60"
+              >
+                {isRestarting ? 'Qayta boshlanmoqda…' : 'Yana bir bor oʼynash'}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => navigate('/burro/modules')}
-              className="w-full rounded-lg bg-gray-100 py-3 font-semibold text-gray-700"
+              className="w-full rounded-[28px] border border-gray-200 py-4 font-bold text-gray-500"
             >
               Boshqa modulni tanlash
             </button>
@@ -248,7 +279,20 @@ export default function PracticePlayer() {
   }
 
   if (isStarting || (attemptId && isQuestionsLoading)) {
-    return <div className="p-4 text-sm text-gray-500">Mashq yuklanmoqda...</div>;
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="h-14 animate-pulse bg-gray-100" />
+        <div className="px-6 pt-24 pb-36">
+          <div className="mx-auto mb-8 h-6 w-48 animate-pulse rounded-full bg-gray-100" />
+          <div className="mx-auto mb-12 h-32 w-32 animate-pulse rounded-2xl bg-gray-100" />
+          <div className="grid grid-cols-2 gap-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-[58px] animate-pulse rounded-xl bg-gray-100" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const initialError = startError || questionsError;
@@ -276,62 +320,88 @@ export default function PracticePlayer() {
     );
   }
 
-  return (
-    <div className="p-4">
-      <div className="mb-4 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="px-3 py-2">
-          Orqaga
-        </button>
-        <div className="text-sm text-gray-500">
-          {progressCount}/{totalQuestions} • {livesRemaining} jon
-        </div>
-        <div className="text-xs text-gray-400">Amaliyot</div>
-      </div>
+  const lessonQuestion: LessonPlayQuestion = {
+    id: currentQuestion.id,
+    letter: currentQuestion.letter ?? '',
+    prompt: currentQuestion.prompt,
+    options: currentQuestion.options.map((opt) => ({ key: opt, label: opt })),
+  };
 
-      <div className="rounded-lg bg-white p-6">
-        <QuestionCard q={currentQuestion} />
-        <div className="mt-4 space-y-3">
-          {currentQuestion.options.map((option) => (
-            <OptionButton
-              key={`${currentQuestion.id}-${option}`}
-              onClick={() => handleSelect(option)}
-              selected={selected === option}
-              disabled={!!feedback}
-            >
-              {option}
-            </OptionButton>
-          ))}
-        </div>
+  const progressPercent =
+    totalQuestions > 0 ? Math.round((progressCount / totalQuestions) * 100) : 0;
+
+  return (
+    <div className="relative min-h-screen bg-white">
+      <LessonPlayHeader
+        progressPercent={progressPercent}
+        hearts={livesRemaining}
+        xpText="+0 XP"
+        closeAriaLabel="Yopish"
+        onClose={() => navigate('/burro/modules')}
+      />
+
+      {currentQuestion.type === 'audio' ? (
+        <AudioQuestion
+          question={lessonQuestion}
+          selectedOptionKey={selected}
+          feedbackCorrectKey={feedback?.correctAnswer ?? null}
+          isAnswered={!!feedback}
+          onReplay={() => {
+            const audio = document.querySelector<HTMLAudioElement>('audio[data-question]');
+            void audio?.play();
+          }}
+          onSelectOption={handleSelect}
+        />
+      ) : (
+        <McqQuestion
+          question={lessonQuestion}
+          selectedOptionKey={selected}
+          feedbackCorrectKey={feedback?.correctAnswer ?? null}
+          isAnswered={!!feedback}
+          onSelectOption={handleSelect}
+        />
+      )}
+
+      {currentQuestion.type === 'audio' && currentQuestion.audioUrl && (
+        <audio
+          data-question
+          src={currentQuestion.audioUrl}
+          preload="auto"
+          autoPlay
+          className="hidden"
+        />
+      )}
+
+      <div className="fixed right-0 bottom-0 left-0 bg-white px-4 pt-3 pb-6 shadow-[0_-1px_0_rgb(229,231,235)]">
+        {feedback && (
+          <div className="mb-3">
+            <ResultBanner
+              variant={feedback.isCorrect ? 'success' : 'error'}
+              title={feedback.isCorrect ? "To'g'ri javob!" : 'Javob xato'}
+              descriptionPrefix={!feedback.isCorrect ? "To'g'ri javob:" : undefined}
+              descriptionValue={!feedback.isCorrect ? feedback.correctAnswer : undefined}
+            />
+            {feedback.tip && <p className="mt-2 text-sm text-gray-500">{feedback.tip}</p>}
+          </div>
+        )}
 
         {!feedback && submitError && (
-          <div className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-            {getErrorMessage(submitError, 'Javobni yuborib bo‘lmadi')}
+          <div className="mb-3 rounded-lg bg-error-50 p-3 text-sm text-error-700">
+            {getErrorMessage(submitError, "Javobni yuborib bo'lmadi")}
+          </div>
+        )}
+        {finishError && (
+          <div className="mb-3 rounded-lg bg-error-50 p-3 text-sm text-error-700">
+            {getErrorMessage(finishError, "Darsni yakunlab bo'lmadi")}
           </div>
         )}
 
-        {feedback && (
-          <div
-            className={`mt-4 rounded-lg p-4 text-sm ${feedback.isCorrect ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
-          >
-            <div className="font-semibold">
-              {feedback.isCorrect ? 'To‘g‘ri javob' : 'Javob xato'}
-            </div>
-            {!feedback.isCorrect && (
-              <div className="mt-2">
-                To‘g‘ri javob: <span className="font-semibold">{feedback.correctAnswer}</span>
-              </div>
-            )}
-            {feedback.tip && <div className="mt-2">{feedback.tip}</div>}
-            {submitError && <div className="mt-2">{getErrorMessage(submitError)}</div>}
-            {finishError && <div className="mt-2">{getErrorMessage(finishError)}</div>}
-          </div>
-        )}
-      </div>
-
-      <div className="fixed right-0 bottom-0 left-0 border-t bg-white p-4">
         {!feedback ? (
           <button
-            className={`w-full rounded-lg py-3 ${selected ? 'bg-teal-600 text-white' : 'bg-gray-300'}`}
+            type="button"
+            className={`w-full rounded-[28px] py-4 text-base font-bold transition-colors ${
+              selected ? 'bg-teal-600 text-white' : 'cursor-not-allowed bg-gray-100 text-gray-400'
+            }`}
             onClick={handleCheck}
             disabled={!selected || isSubmitting}
           >
@@ -339,7 +409,8 @@ export default function PracticePlayer() {
           </button>
         ) : (
           <button
-            className="w-full rounded-lg bg-teal-600 py-3 text-white"
+            type="button"
+            className="w-full rounded-[28px] bg-teal-600 py-4 text-base font-bold text-white"
             onClick={handleNext}
             disabled={isFinishing}
           >

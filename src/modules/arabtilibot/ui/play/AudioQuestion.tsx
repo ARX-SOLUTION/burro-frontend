@@ -6,6 +6,8 @@ import { AnswerOptionTile } from '@/modules/arabtilibot/ui/play/AnswerOptionTile
 type AudioQuestionProps = {
   question: LessonPlayQuestion;
   selectedOptionKey: string | null;
+  feedbackCorrectKey?: string | null;
+  isAnswered?: boolean;
   onReplay: () => void;
   onSelectOption: (optionKey: string) => void;
 };
@@ -13,6 +15,8 @@ type AudioQuestionProps = {
 export const AudioQuestion = ({
   question,
   selectedOptionKey,
+  feedbackCorrectKey,
+  isAnswered,
   onReplay,
   onSelectOption,
 }: AudioQuestionProps) => {
@@ -49,7 +53,14 @@ export const AudioQuestion = ({
           <AnswerOptionTile
             key={option.key}
             label={option.label}
-            isSelected={selectedOptionKey === option.key}
+            isSelected={selectedOptionKey === option.key && !feedbackCorrectKey}
+            isCorrect={!!feedbackCorrectKey && option.key === feedbackCorrectKey}
+            isWrong={
+              !!feedbackCorrectKey &&
+              selectedOptionKey === option.key &&
+              option.key !== feedbackCorrectKey
+            }
+            isDisabled={!!isAnswered}
             onSelect={() => onSelectOption(option.key)}
           />
         ))}

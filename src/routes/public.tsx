@@ -27,6 +27,7 @@ const BurroProfilePage = lazy(() =>
 const BurroLeaderboardPage = lazy(() =>
   import('@/pages/BurroLeaderboardPage').then((m) => ({ default: m.BurroLeaderboardPage })),
 );
+const BurroStatisticsPage = lazy(() => import('@/pages/BurroStatisticsPage'));
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -103,6 +104,16 @@ export const publicRoutes: RouteObject[] = [
       <AuthGuard>
         <StudentGuard>
           <BurroLeaderboardPage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/statistics',
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroStatisticsPage />
         </StudentGuard>
       </AuthGuard>
     ),

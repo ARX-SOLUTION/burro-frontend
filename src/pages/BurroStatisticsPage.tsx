@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import { useStatisticsChart } from '@/modules/arabtilibot/services/useStatisticsChart';
 import { useStudentStatistics } from '@/modules/arabtilibot/services/useStudentStatistics';
@@ -12,7 +12,7 @@ const PERIOD_OPTIONS: Array<{ id: StatisticsChartPeriod; label: string }> = [
   { id: '30d', label: '30 kun' },
 ];
 
-function XpBarChart({ labels, xpData }: { labels: string[]; xpData: number[] }) {
+const XpBarChart = memo(({ labels, xpData }: { labels: string[]; xpData: number[] }) => {
   const max = Math.max(...xpData, 1);
   const BAR_H = 120;
 
@@ -36,7 +36,8 @@ function XpBarChart({ labels, xpData }: { labels: string[]; xpData: number[] }) 
       })}
     </div>
   );
-}
+});
+XpBarChart.displayName = 'XpBarChart';
 
 export default function BurroStatisticsPage() {
   usePageMetadata({ title: 'Statistika' });
@@ -44,18 +45,29 @@ export default function BurroStatisticsPage() {
 
   const statsQuery = useStudentStatistics();
   const chartQuery = useStatisticsChart(period);
+  const { refetch: refetchStats } = statsQuery;
 
   const stats = statsQuery.data;
   const chart = chartQuery.data;
 
-  const summaryCards = stats
-    ? [
-        { label: 'Jami XP', value: String(stats.total_xp), unit: 'XP' },
-        { label: 'Aniqlik', value: String(stats.accuracy_pct), unit: '%' },
-        { label: 'Tamomlangan modullar', value: String(stats.modules_completed), unit: 'ta' },
-        { label: 'Streak', value: String(stats.current_streak), unit: 'kun' },
-      ]
-    : [];
+  const summaryCards = useMemo(
+    () =>
+      stats
+        ? [
+            { label: 'Jami XP', value: String(stats.total_xp), unit: 'XP' },
+            { label: 'Aniqlik', value: String(stats.accuracy_pct), unit: '%' },
+            { label: 'Tamomlangan modullar', value: String(stats.modules_completed), unit: 'ta' },
+            { label: 'Streak', value: String(stats.current_streak), unit: 'kun' },
+          ]
+        : [],
+    [stats],
+  );
+
+  const handlePeriodChange = useCallback((period: StatisticsChartPeriod) => {
+    setPeriod(period);
+  }, []);
+
+  const handleRetryStats = useCallback(() => void refetchStats(), [refetchStats]);
 
   return (
     <>
@@ -97,7 +109,7 @@ export default function BurroStatisticsPage() {
                   <button
                     key={opt.id}
                     type="button"
-                    onClick={() => setPeriod(opt.id)}
+                    onClick={() => handlePeriodChange(opt.id)}
                     className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                       period === opt.id ? 'bg-teal-500 text-white' : 'bg-white/10 text-white/60'
                     }`}
@@ -161,7 +173,7 @@ export default function BurroStatisticsPage() {
               Statistika yuklanmadi.{' '}
               <button
                 type="button"
-                onClick={() => void statsQuery.refetch()}
+                onClick={handleRetryStats}
                 className="font-semibold text-white underline"
               >
                 Qayta urinish

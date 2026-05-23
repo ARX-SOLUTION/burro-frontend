@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import {
@@ -68,9 +68,29 @@ export default function PracticePlayer() {
     [questionsResponse],
   );
 
-  const currentQuestion = questions[index];
+  const currentQuestion = useMemo(() => questions[index], [questions, index]);
+  const currentQuestionOptions = useMemo(
+    () => currentQuestion?.options.map((opt) => ({ key: opt, label: opt })) ?? [],
+    [currentQuestion],
+  );
+
+  const lessonQuestion = useMemo<LessonPlayQuestion | null>(() => {
+    if (!currentQuestion) return null;
+
+    return {
+      id: currentQuestion.id,
+      letter: currentQuestion.letter ?? '',
+      prompt: currentQuestion.prompt,
+      options: currentQuestionOptions,
+    };
+  }, [currentQuestion, currentQuestionOptions]);
+
   const progressCount = answeredQuestionIds.length;
   const totalQuestions = questionsResponse?.total_questions ?? 0;
+  const progressPercent = useMemo(
+    () => (totalQuestions > 0 ? Math.round((progressCount / totalQuestions) * 100) : 0),
+    [progressCount, totalQuestions],
+  );
   const livesRemaining = feedback?.livesRemaining ?? questionsResponse?.lives_remaining ?? 0;
 
   useEffect(() => {
@@ -113,7 +133,15 @@ export default function PracticePlayer() {
     resetFinishAttempt();
   }, [index, resetFinishAttempt, resetSubmitAnswer]);
 
-  const handleRetry = () => {
+  const resetAttemptState = useCallback(() => {
+    setFinishSummary(null);
+    setSelected(null);
+    setFeedback(null);
+    setAnsweredQuestionIds([]);
+    setIndex(0);
+  }, []);
+
+  const handleRetry = useCallback(() => {
     if (!moduleId) return;
     void startAttempt(moduleId)
       .then((response) => {
@@ -121,14 +149,25 @@ export default function PracticePlayer() {
         void refetchQuestions();
       })
       .catch(() => undefined);
-  };
+  }, [moduleId, refetchQuestions, startAttempt]);
 
-  function handleSelect(answer: string) {
-    if (feedback) return;
-    setSelected(answer);
-  }
+  const handleSelect = useCallback(
+    (answer: string) => {
+      if (feedback) return;
+      setSelected(answer);
+    },
+    [feedback],
+  );
 
-  async function handleCheck() {
+  const handleRestartAttempt = useCallback(() => {
+    if (!moduleId) return;
+    void restartAttempt(moduleId).then((response) => {
+      resetAttemptState();
+      setAttemptId(response.attempt_id);
+    });
+  }, [moduleId, restartAttempt, resetAttemptState]);
+
+  const handleCheck = useCallback(async () => {
     if (!selected || !attemptId || !currentQuestion) return;
 
     try {
@@ -154,9 +193,18 @@ export default function PracticePlayer() {
     } catch {
       return;
     }
-  }
+  }, [selected, attemptId, currentQuestion, submitAnswer]);
 
-  async function handleNext() {
+  const handleReplay = useCallback(() => {
+    const audio = document.querySelector<HTMLAudioElement>('audio[data-question]');
+    void audio?.play();
+  }, []);
+
+  const handleClose = useCallback(() => {
+    navigate('/burro/modules');
+  }, [navigate]);
+
+  const handleNext = useCallback(async () => {
     if (!feedback) return;
 
     if (feedback.attemptStatus === 'failed') {
@@ -193,7 +241,7 @@ export default function PracticePlayer() {
     } else {
       navigate('/burro/modules');
     }
-  }
+  }, [attemptId, feedback, finishAttempt, index, navigate, questions, answeredQuestionIds]);
 
   if (!moduleId) {
     return (
@@ -250,16 +298,7 @@ export default function PracticePlayer() {
               <button
                 type="button"
                 disabled={isRestarting}
-                onClick={() => {
-                  void restartAttempt(moduleId).then((response) => {
-                    setFinishSummary(null);
-                    setAttemptId(response.attempt_id);
-                    setIndex(0);
-                    setSelected(null);
-                    setFeedback(null);
-                    setAnsweredQuestionIds([]);
-                  });
-                }}
+                onClick={handleRestartAttempt}
                 className="w-full rounded-[28px] bg-gray-100 py-4 font-bold text-gray-700 disabled:opacity-60"
               >
                 {isRestarting ? 'Qayta boshlanmoqda…' : 'Yana bir bor oʼynash'}
@@ -310,7 +349,7 @@ export default function PracticePlayer() {
     );
   }
 
-  if (!currentQuestion) {
+  if (!currentQuestion || !lessonQuestion) {
     return (
       <div className="p-4">
         <div className="rounded-lg bg-white p-4 text-sm text-gray-500 shadow-sm">
@@ -320,16 +359,6 @@ export default function PracticePlayer() {
     );
   }
 
-  const lessonQuestion: LessonPlayQuestion = {
-    id: currentQuestion.id,
-    letter: currentQuestion.letter ?? '',
-    prompt: currentQuestion.prompt,
-    options: currentQuestion.options.map((opt) => ({ key: opt, label: opt })),
-  };
-
-  const progressPercent =
-    totalQuestions > 0 ? Math.round((progressCount / totalQuestions) * 100) : 0;
-
   return (
     <div className="relative min-h-screen bg-white">
       <LessonPlayHeader
@@ -337,7 +366,7 @@ export default function PracticePlayer() {
         hearts={livesRemaining}
         xpText="+0 XP"
         closeAriaLabel="Yopish"
-        onClose={() => navigate('/burro/modules')}
+        onClose={handleClose}
       />
 
       {currentQuestion.type === 'audio' ? (
@@ -346,10 +375,7 @@ export default function PracticePlayer() {
           selectedOptionKey={selected}
           feedbackCorrectKey={feedback?.correctAnswer ?? null}
           isAnswered={!!feedback}
-          onReplay={() => {
-            const audio = document.querySelector<HTMLAudioElement>('audio[data-question]');
-            void audio?.play();
-          }}
+          onReplay={handleReplay}
           onSelectOption={handleSelect}
         />
       ) : (

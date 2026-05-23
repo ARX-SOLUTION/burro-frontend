@@ -1,12 +1,13 @@
+import { memo } from 'react';
+
 import type { BurroModuleListItem } from '@/modules/arabtilibot/types/view';
 
-export default function ModuleCard({
-  module,
-  onStart,
-}: {
+type ModuleCardProps = {
   module: BurroModuleListItem;
   onStart?: (id: string) => void;
-}) {
+};
+
+const ModuleCard = ({ module, onStart }: ModuleCardProps) => {
   const isLocked = module.status === 'locked';
   const isActive = module.status === 'in_progress';
 
@@ -74,4 +75,6 @@ export default function ModuleCard({
       </div>
     </button>
   );
-}
+};
+
+export default memo(ModuleCard);

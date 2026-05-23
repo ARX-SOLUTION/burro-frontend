@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { mapLeaderboardToView } from '@/modules/arabtilibot/libs/mappers';
 import { useLeaderboard } from '@/modules/arabtilibot/services/useLeaderboard';
@@ -19,20 +19,34 @@ export const BurroLeaderboardPage = () => {
     [leaderboardQuery.data],
   );
 
+  const { refetch } = leaderboardQuery;
+
+  const errorMessage = useMemo(
+    () =>
+      leaderboardQuery.error
+        ? getErrorMessage(leaderboardQuery.error, 'Reytingni yuklab bo‘lmadi')
+        : null,
+    [leaderboardQuery.error],
+  );
+
+  const handlePeriodChange = useCallback((selectedPeriod: LeaderboardPeriod) => {
+    setPeriod(selectedPeriod);
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   return (
     <>
       <div className="pb-28">
         <Leaderboard
           data={data}
           period={period}
-          onPeriodChange={setPeriod}
+          onPeriodChange={handlePeriodChange}
           isLoading={leaderboardQuery.isLoading}
-          errorMessage={
-            leaderboardQuery.error
-              ? getErrorMessage(leaderboardQuery.error, 'Reytingni yuklab bo‘lmadi')
-              : null
-          }
-          onRetry={() => void leaderboardQuery.refetch()}
+          errorMessage={errorMessage}
+          onRetry={handleRetry}
         />
       </div>
       <BottomNav />

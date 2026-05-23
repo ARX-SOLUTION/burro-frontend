@@ -1,3 +1,5 @@
+import { memo, useCallback } from 'react';
+
 import type { LeaderboardPeriod } from '@/modules/arabtilibot/types/api';
 import type { BurroLeaderboardData, BurroLeaderboardEntry } from '@/modules/arabtilibot/types/view';
 
@@ -18,7 +20,7 @@ const PERIOD_OPTIONS: Array<{ id: LeaderboardPeriod; label: string }> = [
 
 const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
-function EntryRow({ entry }: { entry: BurroLeaderboardEntry }) {
+const EntryRow = memo(function EntryRow({ entry }: { entry: BurroLeaderboardEntry }) {
   const medal = MEDAL[entry.rank];
   return (
     <div
@@ -61,9 +63,9 @@ function EntryRow({ entry }: { entry: BurroLeaderboardEntry }) {
       </span>
     </div>
   );
-}
+});
 
-export default function Leaderboard({
+function Leaderboard({
   data,
   period,
   onPeriodChange,
@@ -71,6 +73,11 @@ export default function Leaderboard({
   errorMessage,
   onRetry,
 }: LeaderboardProps) {
+  const handlePeriodChange = useCallback(
+    (option: LeaderboardPeriod) => onPeriodChange(option),
+    [onPeriodChange],
+  );
+
   return (
     <div className="px-4 pt-4 pb-8">
       {/* Period tabs */}
@@ -79,7 +86,7 @@ export default function Leaderboard({
           <button
             key={option.id}
             type="button"
-            onClick={() => onPeriodChange(option.id)}
+            onClick={() => handlePeriodChange(option.id)}
             className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
               period === option.id ? 'bg-teal-600 text-white shadow-sm' : 'bg-white text-gray-600'
             }`}
@@ -156,3 +163,4 @@ export default function Leaderboard({
     </div>
   );
 }
+export default memo(Leaderboard);

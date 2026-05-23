@@ -7,9 +7,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: burro-frontend
     steps:
       - uses: actions/checkout@v4
 
@@ -36,7 +33,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
-          source: "burro-frontend/dist/"
+          source: "dist/"
           target: "/root/projects/burro/burro-frontend/"
           rm: true
 

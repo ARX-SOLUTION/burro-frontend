@@ -10,6 +10,7 @@ type ProfileProps = {
   errorMessage?: string | null;
   onRetry?: () => void;
   onSave?: (data: UpdateStudentProfileRequest) => void;
+  onLogout?: () => void;
 };
 
 const LANGUAGE_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
@@ -51,6 +52,7 @@ export default function Profile({
   errorMessage,
   onRetry,
   onSave,
+  onLogout,
 }: ProfileProps) {
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -235,6 +237,7 @@ export default function Profile({
               </button>
               <button
                 type="button"
+                onClick={onLogout}
                 className="flex-1 rounded-[28px] bg-error-500 py-3 text-sm font-bold text-white"
               >
                 Ha, chiqish

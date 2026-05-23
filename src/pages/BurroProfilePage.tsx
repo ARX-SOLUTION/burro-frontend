@@ -6,6 +6,7 @@ import { useStudentStatistics } from '@/modules/arabtilibot/services/useStudentS
 import { useUpdateStudentProfile } from '@/modules/arabtilibot/services/useUpdateStudentProfile';
 import BottomNav from '@/modules/arabtilibot/ui/BottomNav';
 import Profile from '@/modules/arabtilibot/ui/Profile';
+import { useLogoutMutation } from '@/modules/auth/services/useLogoutMutation';
 import { getErrorMessage } from '@/modules/common';
 
 import { usePageMetadata } from '@/libs/usePageMetadata';
@@ -15,6 +16,7 @@ export const BurroProfilePage = () => {
   const profileQuery = useStudentProfile();
   const statisticsQuery = useStudentStatistics();
   const updateMutation = useUpdateStudentProfile();
+  const logoutMutation = useLogoutMutation();
 
   const profileData = useMemo(() => {
     if (!profileQuery.data || !statisticsQuery.data) return undefined;
@@ -45,6 +47,10 @@ export const BurroProfilePage = () => {
     void refetchStatistics();
   }, [refetchProfile, refetchStatistics]);
 
+  const handleLogout = useCallback(() => {
+    logoutMutation.mutate();
+  }, [logoutMutation]);
+
   return (
     <>
       <div className="pb-28">
@@ -55,6 +61,7 @@ export const BurroProfilePage = () => {
           errorMessage={error}
           onSave={handleSave}
           onRetry={handleRetry}
+          onLogout={handleLogout}
         />
       </div>
       <BottomNav />

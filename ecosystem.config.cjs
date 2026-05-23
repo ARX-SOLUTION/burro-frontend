@@ -1,0 +1,20 @@
+module.exports = {
+  apps: [{
+    name: 'burro-frontend',
+    script: '/root/.nvm/versions/node/v24.16.0/bin/serve',
+    args: '-s dist -p 5173 -n',
+    interpreter: 'node',
+    cwd: '/root/projects/burro/burro-frontend',
+    instances: 1,
+    exec_mode: 'fork',
+    env: { NODE_ENV: 'production' },
+    error_file: '/root/.pm2/logs/burro-frontend-error.log',
+    out_file: '/root/.pm2/logs/burro-frontend-out.log',
+    log_date_format: 'YYYY-MM-DD HH:mm:ss',
+    restart_delay: 2000,
+    max_restarts: 10,
+    min_uptime: '5s',
+    watch: false,
+    autorestart: true,
+  }],
+}

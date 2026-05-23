@@ -1,8 +1,15 @@
-import { createContext, type PropsWithChildren, useCallback, useEffect, useRef } from 'react';
+import {
+  createContext,
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { type AuthUser, canLogin } from '@/modules/auth';
+import { authAPI, type AuthUser, canLogin } from '@/modules/auth';
 import { userQueryKeys, useUserProfile } from '@/modules/users';
 
 import { tokenStorage } from '@/libs/storage';
@@ -22,7 +29,36 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const hasToken = tokenStorage.hasValidToken();
   const hasShownAccessDenied = useRef(false);
 
+  const [isInitiatingTelegram, setIsInitiatingTelegram] = useState(
+    () => !tokenStorage.hasValidToken() && Boolean(window.Telegram?.WebApp?.initData),
+  );
+
   const { data: profileData, isLoading: isProfileLoading } = useUserProfile();
+
+  useEffect(() => {
+    window.Telegram?.WebApp?.ready();
+    window.Telegram?.WebApp?.expand();
+
+    if (tokenStorage.hasValidToken()) {
+      return;
+    }
+
+    const initData = window.Telegram?.WebApp?.initData;
+    if (!initData) {
+      return;
+    }
+
+    authAPI
+      .telegramMiniAppLogin(initData)
+      .then((data) => {
+        tokenStorage.setTokens(data.accessToken, data.refreshToken);
+        queryClient.setQueryData(userQueryKeys.profile(), data.user);
+      })
+      .catch(() => {})
+      .finally(() => {
+        setIsInitiatingTelegram(false);
+      });
+  }, [queryClient]);
 
   useEffect(() => {
     if (profileData && !canLogin(profileData.role) && !hasShownAccessDenied.current) {
@@ -52,7 +88,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   }, [queryClient]);
 
   const isAuthenticated = !!user && hasToken;
-  const isLoading = hasToken && isProfileLoading;
+  const isLoading = isInitiatingTelegram || (hasToken && isProfileLoading);
 
   return (
     <AuthContext.Provider

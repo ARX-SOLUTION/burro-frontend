@@ -15,6 +15,7 @@ import type {
 const AUTH_ROUTES = {
   signup: '/auth/signup',
   signin: '/auth/signin',
+  telegram: '/auth/telegram',
   refresh: '/auth/refresh',
   logout: '/auth/logout',
   forgotPassword: '/auth/forgot-password',
@@ -32,6 +33,11 @@ export const authAPI = {
   signin: (payload: SigninRequest) =>
     authAxiosInstance
       .post<AuthSuccessResponse>(AUTH_ROUTES.signin, payload)
+      .then((res) => res.data),
+
+  telegramMiniAppLogin: (initData: string) =>
+    authAxiosInstance
+      .post<AuthSuccessResponse>(AUTH_ROUTES.telegram, { initData })
       .then((res) => res.data),
 
   refresh: (payload: RefreshTokenRequest) =>

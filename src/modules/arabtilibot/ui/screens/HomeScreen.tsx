@@ -5,8 +5,18 @@ import type { HomeDashboardData } from '@/modules/arabtilibot/types/module';
 
 import { Button } from '@/components/base/buttons/button';
 
+type ChildCard = {
+  id: string;
+  name: string;
+  status: string;
+  timeSpent: string;
+  xp: number;
+  avatarUrl?: string | null;
+};
+
 type HomeScreenProps = {
   data: HomeDashboardData;
+  children?: ChildCard[];
   onOpenModulesList: () => void;
   onStartLesson: (lessonId: string) => void;
 };
@@ -58,8 +68,47 @@ const DurationIcon = memo(function DurationIcon() {
 });
 DurationIcon.displayName = 'DurationIcon';
 
+const ChildCardComponent = memo(function ChildCardComponent({ child }: { child: ChildCard }) {
+  return (
+    <div className="rounded-[28px] bg-white p-4 shadow-xl">
+      <div className="flex items-center gap-3">
+        <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-teal-400 to-cyan-500 text-xl font-bold text-white">
+          {child.name[0]}
+        </div>
+
+        <div>
+          <p className="text-lg leading-6 font-semibold text-gray-900">{child.name}</p>
+          <span className="mt-1 inline-flex items-center rounded-full bg-success-100 px-2 py-0.5 text-xs leading-4 font-semibold text-success-700">
+            {child.status}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center gap-4 text-sm leading-5 text-gray-600">
+        <span>Sarflangan vaqt: {child.timeSpent}</span>
+        <span>XP: {child.xp}</span>
+      </div>
+
+      <div className="mt-3 flex items-center gap-3">
+        <button
+          type="button"
+          className="rounded-full bg-gradient-to-r from-[#20B7E5] to-[#0D9488] px-5 py-2 text-sm leading-5 font-semibold text-white"
+        >
+          Boshlash
+        </button>
+
+        <button type="button" className="text-sm leading-5 font-semibold text-teal-600">
+          Statistika
+        </button>
+      </div>
+    </div>
+  );
+});
+ChildCardComponent.displayName = 'ChildCardComponent';
+
 export const HomeScreen = memo(function HomeScreen({
   data,
+  children,
   onOpenModulesList,
   onStartLesson,
 }: HomeScreenProps) {
@@ -89,6 +138,18 @@ export const HomeScreen = memo(function HomeScreen({
             </div>
           </div>
         </header>
+
+        {children && children.length > 0 && (
+          <section className="px-2">
+            <p className="mb-3 text-base leading-5 font-semibold text-white">Farzandlar</p>
+
+            <div className="flex flex-col gap-3">
+              {children.map((child) => (
+                <ChildCardComponent key={child.id} child={child} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="flex flex-col gap-2 px-2 pb-8">
           <section className="relative h-[201px] overflow-hidden rounded-[28px] bg-gradient-to-br from-success-400 via-teal-600 to-teal-700 p-5 shadow-2xl">

@@ -1,198 +1,44 @@
-name: Frontend CI/CD Pipeline
+name: Deploy Frontend
 
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
-
-env:
-  NODE_VERSION: '20'
-  PNPM_VERSION: '9'
-  VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL || secrets['VITE_API_BASE_URL'] }}
-  APP_URL: ${{ vars.APP_URL || secrets['APP_URL'] }}
-  TELEGRAM_THREAD_ID: ${{ vars.TELEGRAM_THREAD_ID || secrets['TELEGRAM_THREAD_ID'] }}
 
 jobs:
-  test:
-    name: 🧪 Test & Lint
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 📦 Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 🏗 Setup pnpm
-        uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          version: ${{ env.PNPM_VERSION }}
-          run_install: false
+          node-version: '20'
+          cache: 'npm'
 
-      - name: 🏗 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'pnpm'
+      - name: Install
+        run: npm install
 
-      - name: ℹ️ Toolchain info
-        run: |
-          echo "Node.js: $(node --version)"
-          echo "npm: $(npm --version)"
-          echo "pnpm: $(pnpm --version)"
-
-      - name: 📦 Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: 🔍 Lint code
-        run: pnpm lint:check
-
-      - name: 🏗 Build application
-        run: pnpm build
-
-  build:
-    name: 🏗 Build Docker Image
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    outputs:
-      image-tag: ${{ steps.meta.outputs.tags }}
-      image-digest: ${{ steps.build.outputs.digest }}
-
-    steps:
-      - name: 📦 Checkout
-        uses: actions/checkout@v4
-
-      - name: 🏗 Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 🔑 Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_TOKEN }}
-
-      - name: 🏷 Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ secrets.DOCKER_HUB_USERNAME }}/burro-frontend
-          tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha,prefix={{branch}}-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-      - name: 🏗 Build and push
-        id: build
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VITE_API_BASE_URL=${{ env.VITE_API_BASE_URL }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          platforms: linux/amd64
-
-  deploy:
-    name: 🚀 Deploy to Server
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    environment:
-      name: ${{ vars.DEPLOY_ENVIRONMENT || 'production' }}
-
-    steps:
-      - name: 📦 Checkout
-        uses: actions/checkout@v4
-
-      - name: 🔑 Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
-        with:
-          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
-
-      - name: 📋 Add server to known hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      - name: 🚀 Deploy to Server
+      - name: Build
+        run: NODE_OPTIONS="--max-old-space-size=4096" npm run build
         env:
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-          DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_TOKEN }}
-          VITE_API_BASE_URL: ${{ env.VITE_API_BASE_URL }}
-        run: |
-          ssh ${SERVER_USER}@${SERVER_HOST} "
-            set -e
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 
-            # Login to Docker Hub
-            echo \"${DOCKER_HUB_TOKEN}\" | docker login -u \"${DOCKER_HUB_USERNAME}\" --password-stdin
+      - name: Copy dist to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          source: "dist/"
+          target: "/root/projects/burro/burro-frontend/"
+          rm: true
 
-            cd ${PROJECT_PATH:-/home/deploy/projects/burro/burro-frontend}
-            git config --global --add safe.directory \$(pwd)
-
-            # Stop containers using OLD compose file before pulling new code
-            docker compose down --remove-orphans || true
-            docker rm -f burro-frontend 2>/dev/null || true
-
-            git pull origin main
-
-            # Pull latest image from Docker Hub
-            docker pull ${DOCKER_HUB_USERNAME}/burro-frontend:latest
-
-            # Export build-time API url for compose builds, when needed
-            export VITE_API_BASE_URL=\"${VITE_API_BASE_URL}\"
-
-            # Start with Docker Compose
-            docker compose up -d
-
-            # Check container health
-            docker compose ps
-
-            # Cleanup old images
-            docker image prune -f
-          "
-
-      - name: 🔍 Health Check
-        run: |
-          echo "Waiting for application to start..."
-          sleep 30
-          for i in {1..5}; do
-            if curl -sf ${{ env.APP_URL }}; then
-              echo "✅ Health check passed"
-              exit 0
-            fi
-            echo "Attempt $i failed, retrying in 10s..."
-            sleep 10
-          done
-          echo "❌ Health check failed after 5 attempts"
-          exit 1
-
-      - name: 📢 Send Telegram notification
-        if: always()
-        run: |
-          STATUS="${{ job.status == 'success' && '✅ Success' || '❌ Failed' }}"
-          MESSAGE="🚀 *Burro Frontend Deployment*
-
-          📦 Repository: \`${{ github.repository }}\`
-          🌿 Branch: \`${{ github.ref_name }}\`
-          🔗 Commit: \`${GITHUB_SHA::7}\`
-          👤 Actor: \`${{ github.actor }}\`
-          📊 Status: ${STATUS}
-
-          [View Workflow](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"chat_id\": \"${{ secrets.TELEGRAM_CHAT_ID }}\",
-              \"message_thread_id\": ${{ env.TELEGRAM_THREAD_ID }},
-              \"text\": \"$MESSAGE\",
-              \"parse_mode\": \"Markdown\",
-              \"disable_web_page_preview\": true
-            }"
+      - name: Restart PM2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: root
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            pm2 restart burro-frontend --update-env
+            pm2 save

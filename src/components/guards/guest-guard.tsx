@@ -23,12 +23,6 @@ export const GuestGuard = ({ children }: GuestGuardProps) => {
     const fallbackRedirect = getDefaultRedirectForRole(user?.role);
     const redirectUrl = redirectParam || fromState || fallbackRedirect;
 
-    if (user && !user.emailVerified) {
-      return (
-        <Navigate to={`/auth/verify-email?redirect=${encodeURIComponent(redirectUrl)}`} replace />
-      );
-    }
-
     return <Navigate to={redirectUrl} replace />;
   }
 

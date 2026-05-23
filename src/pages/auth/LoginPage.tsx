@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { authAPI } from '@/modules/auth';
-import { LoginForm } from '@/modules/auth/ui';
+import { AUTH_SEARCH_PARAMS, authAPI, buildAuthPathWithRedirect } from '@/modules/auth';
 
 import { Button } from '@/components/base/buttons/button';
 import { Telegram } from '@/components/foundations/social-icons';
@@ -12,6 +12,8 @@ import { usePageMetadata } from '@/libs/usePageMetadata';
 export const LoginPage = () => {
   usePageMetadata({ title: 'Sign In' });
   const { isInitiatingTelegram } = useAuth();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const isTelegramWebApp = Boolean(window.Telegram?.WebApp?.initData);
   const shouldShowTelegramProgress = isTelegramWebApp && isInitiatingTelegram;
@@ -22,7 +24,7 @@ export const LoginPage = () => {
     try {
       const { url } = await authAPI.telegramUrl();
       window.location.href = url;
-    } catch (error) {
+    } catch {
       toast.error('Unable to start Telegram login. Please try again.');
       setIsRedirecting(false);
     }
@@ -48,25 +50,28 @@ export const LoginPage = () => {
             </p>
           </div>
         ) : (
-          <>
-            <div className="mb-6">
-              <Button
-                color="secondary"
-                size="lg"
-                className="w-full"
-                iconLeading={Telegram}
-                isLoading={isRedirecting}
-                onClick={onTelegramLogin}
-              >
-                Continue with Telegram
-              </Button>
-              <p className="mt-3 text-center text-sm text-tertiary">
-                Or sign in with your email and password.
-              </p>
-            </div>
+          <div className="flex flex-col gap-6">
+            <Button
+              color="secondary"
+              size="lg"
+              className="w-full"
+              iconLeading={Telegram}
+              isLoading={isRedirecting}
+              onClick={onTelegramLogin}
+            >
+              Continue with Telegram
+            </Button>
 
-            <LoginForm />
-          </>
+            <p className="text-center text-sm text-tertiary">
+              Don&apos;t have an account?{' '}
+              <Link
+                to={buildAuthPathWithRedirect('/auth/register', redirectUrl)}
+                className="font-semibold text-brand-secondary hover:text-brand-secondary_hover"
+              >
+                Sign up
+              </Link>
+            </p>
+          </div>
         )}
       </div>
     </div>

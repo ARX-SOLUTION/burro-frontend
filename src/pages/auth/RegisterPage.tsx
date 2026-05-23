@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { authAPI } from '@/modules/auth';
-import { RegisterForm } from '@/modules/auth/ui';
+import { AUTH_SEARCH_PARAMS, authAPI, buildAuthPathWithRedirect } from '@/modules/auth';
 
 import { Button } from '@/components/base/buttons/button';
 import { Telegram } from '@/components/foundations/social-icons';
@@ -10,6 +10,8 @@ import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const RegisterPage = () => {
   usePageMetadata({ title: 'Create Account' });
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const isTelegramWebApp = Boolean(window.Telegram?.WebApp?.initData);
 
@@ -19,7 +21,7 @@ export const RegisterPage = () => {
     try {
       const { url } = await authAPI.telegramUrl();
       window.location.href = url;
-    } catch (error) {
+    } catch {
       toast.error('Unable to start Telegram login. Please try again.');
       setIsRedirecting(false);
     }
@@ -42,25 +44,28 @@ export const RegisterPage = () => {
             </p>
           </div>
         ) : (
-          <>
-            <div className="mb-6">
-              <Button
-                color="secondary"
-                size="lg"
-                className="w-full"
-                iconLeading={Telegram}
-                isLoading={isRedirecting}
-                onClick={onTelegramLogin}
-              >
-                Continue with Telegram
-              </Button>
-              <p className="mt-3 text-center text-sm text-tertiary">
-                Or create your account with email and password.
-              </p>
-            </div>
+          <div className="flex flex-col gap-6">
+            <Button
+              color="secondary"
+              size="lg"
+              className="w-full"
+              iconLeading={Telegram}
+              isLoading={isRedirecting}
+              onClick={onTelegramLogin}
+            >
+              Continue with Telegram
+            </Button>
 
-            <RegisterForm />
-          </>
+            <p className="text-center text-sm text-tertiary">
+              Already have an account?{' '}
+              <Link
+                to={buildAuthPathWithRedirect('/auth/login', redirectUrl)}
+                className="font-semibold text-brand-secondary hover:text-brand-secondary_hover"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         )}
       </div>
     </div>

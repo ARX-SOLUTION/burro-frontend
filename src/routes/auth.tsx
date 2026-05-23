@@ -19,6 +19,9 @@ const ResetPasswordPage = lazy(() =>
 const VerifyEmailPage = lazy(() =>
   import('@/pages/auth/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })),
 );
+const TelegramCallbackPage = lazy(() =>
+  import('@/pages/auth/TelegramCallbackPage').then((m) => ({ default: m.TelegramCallbackPage })),
+);
 
 export const authRoutes: RouteObject[] = [
   {
@@ -32,6 +35,10 @@ export const authRoutes: RouteObject[] = [
       {
         path: 'login',
         element: <LoginPage />,
+      },
+      {
+        path: 'telegram/callback',
+        element: <TelegramCallbackPage />,
       },
       {
         path: 'register',

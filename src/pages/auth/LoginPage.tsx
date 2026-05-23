@@ -1,12 +1,31 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import { authAPI } from '@/modules/auth';
 import { LoginForm } from '@/modules/auth/ui';
 
+import { Button } from '@/components/base/buttons/button';
+import { Telegram } from '@/components/foundations/social-icons';
 import { useAuth } from '@/hooks/use-auth';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const LoginPage = () => {
   usePageMetadata({ title: 'Sign In' });
   const { isLoading } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const isTelegramWebApp = Boolean(window.Telegram?.WebApp?.initData);
+
+  const onTelegramLogin = async () => {
+    setIsRedirecting(true);
+
+    try {
+      const { url } = await authAPI.telegramUrl();
+      window.location.href = url;
+    } catch (error) {
+      toast.error('Unable to start Telegram login. Please try again.');
+      setIsRedirecting(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -30,7 +49,25 @@ export const LoginPage = () => {
             )}
           </div>
         ) : (
-          <LoginForm />
+          <>
+            <div className="mb-6">
+              <Button
+                color="secondary"
+                size="lg"
+                className="w-full"
+                iconLeading={Telegram}
+                isLoading={isRedirecting}
+                onClick={onTelegramLogin}
+              >
+                Continue with Telegram
+              </Button>
+              <p className="mt-3 text-center text-sm text-tertiary">
+                Or sign in with your email and password.
+              </p>
+            </div>
+
+            <LoginForm />
+          </>
         )}
       </div>
     </div>

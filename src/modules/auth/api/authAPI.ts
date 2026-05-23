@@ -16,6 +16,8 @@ const AUTH_ROUTES = {
   signup: '/auth/signup',
   signin: '/auth/signin',
   telegram: '/auth/telegram',
+  telegramUrl: '/auth/telegram/url',
+  telegramCode: '/auth/telegram/code',
   refresh: '/auth/refresh',
   logout: '/auth/logout',
   forgotPassword: '/auth/forgot-password',
@@ -38,6 +40,14 @@ export const authAPI = {
   telegramMiniAppLogin: (initData: string) =>
     authAxiosInstance
       .post<AuthSuccessResponse>(AUTH_ROUTES.telegram, { initData })
+      .then((res) => res.data),
+
+  telegramUrl: () =>
+    authAxiosInstance.get<{ url: string }>(AUTH_ROUTES.telegramUrl).then((res) => res.data),
+
+  telegramCodeLogin: (payload: { code: string }) =>
+    authAxiosInstance
+      .post<AuthSuccessResponse>(AUTH_ROUTES.telegramCode, payload)
       .then((res) => res.data),
 
   refresh: (payload: RefreshTokenRequest) =>

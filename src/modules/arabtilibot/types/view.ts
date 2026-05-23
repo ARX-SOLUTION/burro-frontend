@@ -36,6 +36,7 @@ export type BurroLeaderboardEntry = {
   fullName: string;
   xp: number;
   avatarUrl: string | null;
+  classInfo?: string;
   isCurrentUser?: boolean;
 };
 

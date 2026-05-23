@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 
 import type { StudentLanguage, UpdateStudentProfileRequest } from '@/modules/arabtilibot/types/api';
 import type { BurroProfileData } from '@/modules/arabtilibot/types/view';
@@ -16,6 +16,12 @@ const LANGUAGE_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
   { id: 'uz', label: "O'zbek" },
   { id: 'en', label: 'English' },
   { id: 'ru', label: 'Русский' },
+];
+
+const BOTTOM_SHEET_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
+  { id: 'uz', label: "O'zbekcha" },
+  { id: 'ru', label: 'Русский' },
+  { id: 'en', label: 'English' },
 ];
 
 const SkeletonProfile = memo(() => {
@@ -41,64 +47,34 @@ SkeletonProfile.displayName = 'SkeletonProfile';
 export default function Profile({
   profile,
   isLoading = false,
-  isSaving = false,
+  isSaving: _isSaving = false,
   errorMessage,
   onRetry,
   onSave,
 }: ProfileProps) {
-  const [editLanguage, setEditLanguage] = useState<StudentLanguage | null>(null);
-  const [editNotifications, setEditNotifications] = useState<boolean | null>(null);
+  const [showLanguageSheet, setShowLanguageSheet] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  const currentLanguage = editLanguage ?? profile?.language ?? 'uz';
-  const currentNotifications = editNotifications ?? profile?.notificationsEnabled ?? false;
+  const currentLanguage = profile?.language ?? 'uz';
+  const currentNotifications = profile?.notificationsEnabled ?? false;
 
-  const isDirty = useMemo(
-    () =>
-      !!profile &&
-      ((editLanguage !== null && editLanguage !== profile.language) ||
-        (editNotifications !== null && editNotifications !== profile.notificationsEnabled)),
-    [editLanguage, editNotifications, profile],
+  const currentLanguageLabel = LANGUAGE_OPTIONS.find((opt) => opt.id === currentLanguage)?.label;
+
+  const handleLanguageSelect = useCallback(
+    (language: StudentLanguage) => {
+      setShowLanguageSheet(false);
+      if (language !== profile?.language && onSave) {
+        onSave({ language });
+      }
+    },
+    [onSave, profile?.language],
   );
-
-  const infoRows = useMemo(
-    () =>
-      profile
-        ? [
-            { label: 'Jami XP', value: `${profile.xpTotal} XP` },
-            { label: 'Streak', value: `${profile.currentStreak} kun ketma-ket` },
-            { label: 'Eng uzun streak', value: `${profile.longestStreak} kun` },
-            { label: 'Tamomlangan modullar', value: `${profile.completedModules} ta` },
-            { label: 'Umumiy aniqlik', value: `${profile.accuracyPct}%` },
-            { label: 'Telegram', value: profile.telegramLinked ? 'Ulangan' : 'Ulanmagan' },
-          ]
-        : [],
-    [profile],
-  );
-
-  const handleLanguageSelect = useCallback((language: StudentLanguage) => {
-    setEditLanguage(language);
-  }, []);
 
   const handleToggleNotifications = useCallback(() => {
-    setEditNotifications((prev) => (prev !== null ? !prev : !currentNotifications));
-  }, [currentNotifications]);
-
-  const handleSave = useCallback(() => {
-    if (!onSave || !profile) return;
-
-    const payload: UpdateStudentProfileRequest = {
-      ...(editLanguage !== null && editLanguage !== profile.language
-        ? { language: editLanguage }
-        : {}),
-      ...(editNotifications !== null && editNotifications !== profile.notificationsEnabled
-        ? { notifications_enabled: editNotifications }
-        : {}),
-    };
-
-    if (Object.keys(payload).length > 0) {
-      onSave(payload);
+    if (onSave) {
+      onSave({ notifications_enabled: !currentNotifications });
     }
-  }, [editLanguage, editNotifications, onSave, profile]);
+  }, [currentNotifications, onSave]);
 
   if (isLoading) return <SkeletonProfile />;
 
@@ -129,10 +105,8 @@ export default function Profile({
 
   return (
     <div className="px-4 pt-4 pb-8">
-      {/* GreetingCard */}
       <div className="flex h-[72px] items-center justify-between overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-gray-25 via-white to-gray-200 px-3 pr-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
         <div className="flex items-center gap-3">
-          {/* Avatar placeholder */}
           <div className="relative size-11 shrink-0 rounded-full border-2 border-white bg-gradient-to-br from-warning-100 via-gray-50 to-success-100 shadow-sm" />
           <div>
             <p className="text-sm leading-5 font-bold text-gray-900">{profile.fullName}</p>
@@ -145,44 +119,27 @@ export default function Profile({
         </div>
       </div>
 
-      {/* Info rows */}
       <div className="mt-4 overflow-hidden rounded-[20px] bg-white shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
-        {infoRows.map((row, i) => (
-          <div
-            key={row.label}
-            className={`flex h-14 items-center justify-between px-4 ${
-              i < infoRows.length - 1 ? 'border-b border-gray-100' : ''
-            }`}
-          >
-            <span className="text-sm text-gray-700">{row.label}</span>
-            <span className="text-sm font-semibold text-gray-900">{row.value}</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Editable settings */}
-      <div className="mt-4 overflow-hidden rounded-[20px] bg-white shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
-        <div className="border-b border-gray-100 px-4 py-3">
-          <p className="mb-2 text-sm text-gray-700">Ilova tili</p>
-          <div className="flex gap-2">
-            {LANGUAGE_OPTIONS.map((opt) => (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => handleLanguageSelect(opt.id)}
-                className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
-                  currentLanguage === opt.id
-                    ? 'bg-teal-600 text-white'
-                    : 'bg-gray-100 text-gray-600'
-                }`}
-              >
-                {opt.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4">
+          <span className="text-sm text-gray-700">Statistika</span>
+          <span className="text-sm font-semibold text-teal-600">Batafsil</span>
         </div>
-        <div className="flex h-14 items-center justify-between px-4">
-          <span className="text-sm text-gray-700">Bildirishnomalar</span>
+
+        <div className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4">
+          <span className="text-sm text-gray-700">Farzandlar</span>
+          <span className="text-sm font-semibold text-gray-900">2 ta</span>
+        </div>
+
+        <div
+          className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4"
+          onClick={() => setShowLanguageSheet(true)}
+        >
+          <span className="text-sm text-gray-700">Ilova tili</span>
+          <span className="text-sm text-gray-500">{currentLanguageLabel}</span>
+        </div>
+
+        <div className="flex h-14 items-center justify-between border-b border-gray-100 px-4">
+          <span className="text-sm text-gray-700">Eslatmalar</span>
           <button
             type="button"
             role="switch"
@@ -199,57 +156,93 @@ export default function Profile({
             />
           </button>
         </div>
+
+        <div
+          className="flex h-14 cursor-pointer items-center justify-between px-4"
+          onClick={() => setShowLogoutModal(true)}
+        >
+          <span className="text-sm text-error-500">Chiqish</span>
+        </div>
       </div>
 
-      {isDirty && onSave && (
-        <button
-          type="button"
-          disabled={isSaving}
-          onClick={handleSave}
-          className="mt-3 w-full rounded-[28px] bg-teal-600 py-3.5 text-sm font-bold text-white shadow-[0_4px_0_0_rgba(15,118,110,1)] disabled:opacity-60"
-        >
-          {isSaving ? 'Saqlanmoqda…' : 'Sozlamalarni saqlash'}
-        </button>
-      )}
-
-      {/* Weak letters */}
-      {profile.weakLetters.length > 0 && (
-        <div className="mt-4 overflow-hidden rounded-[20px] bg-white p-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
-          <p className="text-sm font-bold text-gray-900">
-            Ko&apos;proq mashq kerak bo&apos;lgan harflar
-          </p>
-          <div className="mt-3 space-y-2">
-            {profile.weakLetters.map((letter) => (
-              <div
-                key={`${letter.arabic}-${letter.sound}`}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <span
-                    className="text-2xl font-bold text-gray-900"
-                    dir="rtl"
-                    style={{ fontFamily: '"Scheherazade New", serif' }}
-                  >
-                    {letter.arabic}
-                  </span>
-                  <span className="text-sm text-gray-500">{letter.sound}</span>
-                </div>
-                <span className="text-xs font-semibold text-error-500">
-                  {letter.errorCount} xato
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* CTA */}
       <button
         type="button"
         className="mt-6 w-full rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-[0_4px_0_0_rgb(11,79,164),0_8px_24px_-4px_rgba(18,183,229,0.44)]"
       >
         Ota-ona rejimiga o&apos;tish
       </button>
+
+      {showLanguageSheet && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+          onClick={() => setShowLanguageSheet(false)}
+        >
+          <div
+            className="w-full max-w-md rounded-t-[20px] bg-white px-4 pt-4 pb-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-gray-300" />
+            <p className="mb-4 text-center text-base font-bold text-gray-900">Til tanlash</p>
+            {BOTTOM_SHEET_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => handleLanguageSelect(opt.id)}
+                className={`w-full rounded-[20px] px-4 py-3 text-left text-sm transition-colors ${
+                  currentLanguage === opt.id
+                    ? 'bg-teal-50 font-bold text-teal-600'
+                    : 'text-gray-700'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {showLogoutModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+          onClick={() => setShowLogoutModal(false)}
+        >
+          <div
+            className="max-w-sm rounded-[20px] bg-white px-6 py-6 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex justify-center">
+              <span className="text-4xl" aria-hidden="true">
+                ⚠️
+              </span>
+            </div>
+            <p className="mb-2 text-center text-lg font-bold text-gray-900">
+              Ehtiyot bo&apos;ling!
+            </p>
+            <p className="mb-1 text-center text-sm text-gray-700">
+              Haqiqatdan ilovadan chiqishni xohlaysizmi?
+            </p>
+            <p className="mb-6 text-center text-xs text-gray-500">
+              Haqiqatdan ham ilovadan chiqishni xohlasangiz &apos;Ha, chiqish&apos; ni bosib
+              tasdiqlang.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLogoutModal(false)}
+                className="flex-1 rounded-[28px] border border-gray-200 py-3 text-sm font-bold text-gray-700"
+              >
+                Yo&apos;q
+              </button>
+              <button
+                type="button"
+                className="flex-1 rounded-[28px] bg-error-500 py-3 text-sm font-bold text-white"
+              >
+                Ha, chiqish
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

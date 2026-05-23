@@ -20,41 +20,68 @@ const PERIOD_OPTIONS: Array<{ id: LeaderboardPeriod; label: string }> = [
 
 const MEDAL: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
 
-const EntryRow = memo(function EntryRow({ entry }: { entry: BurroLeaderboardEntry }) {
+const TopThreeCard = memo(function TopThreeCard({ entry }: { entry: BurroLeaderboardEntry }) {
   const medal = MEDAL[entry.rank];
+  return (
+    <div
+      className={`flex flex-1 flex-col items-center gap-2 rounded-[20px] bg-white px-4 py-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)] ${
+        entry.isCurrentUser ? 'ring-2 ring-teal-400' : ''
+      }`}
+    >
+      <span className="text-2xl" aria-label={`${entry.rank}-o'rin`}>
+        {medal}
+      </span>
+
+      <div className="size-12 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-teal-200 to-blue-300">
+        {entry.avatarUrl && (
+          <img src={entry.avatarUrl} alt={entry.fullName} className="size-full object-cover" />
+        )}
+      </div>
+
+      <div className="text-center">
+        <p className="truncate text-sm font-bold text-gray-900">
+          {entry.fullName}
+          {entry.isCurrentUser && (
+            <span className="ml-1 text-xs font-normal text-teal-600">(Siz)</span>
+          )}
+        </p>
+        {entry.classInfo && <p className="truncate text-xs text-gray-500">{entry.classInfo}</p>}
+      </div>
+
+      <span className="text-sm font-bold" style={{ fontFamily: 'Tahoma, "Segoe UI", sans-serif' }}>
+        {entry.xp} XP
+      </span>
+    </div>
+  );
+});
+
+const RankedRow = memo(function RankedRow({ entry }: { entry: BurroLeaderboardEntry }) {
   return (
     <div
       className={`flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)] ${
         entry.isCurrentUser ? 'ring-2 ring-teal-400' : ''
       }`}
     >
-      {/* rank */}
-      <div className="w-8 shrink-0 text-center">
-        {medal ? (
-          <span className="text-xl" aria-label={`${entry.rank}-o'rin`}>
-            {medal}
-          </span>
-        ) : (
-          <span className="text-sm font-bold text-gray-400">{entry.rank}</span>
-        )}
-      </div>
+      <span className="w-8 shrink-0 text-center text-sm font-bold text-gray-400">
+        #{entry.rank}
+      </span>
 
-      {/* avatar */}
       <div className="size-10 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-teal-200 to-blue-300">
         {entry.avatarUrl && (
           <img src={entry.avatarUrl} alt={entry.fullName} className="size-full object-cover" />
         )}
       </div>
 
-      {/* name */}
-      <p className="flex-1 truncate text-sm font-bold text-gray-900">
-        {entry.fullName}
-        {entry.isCurrentUser && (
-          <span className="ml-1 text-xs font-normal text-teal-600">(Siz)</span>
-        )}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-bold text-gray-900">
+          {entry.fullName}
+          {entry.isCurrentUser && (
+            <span className="ml-1 text-xs font-normal text-teal-600">(Siz)</span>
+          )}
+        </p>
+        {entry.classInfo && <p className="truncate text-xs text-gray-500">{entry.classInfo}</p>}
+      </div>
 
-      {/* xp */}
       <span
         className="shrink-0 text-sm font-bold"
         style={{ fontFamily: 'Tahoma, "Segoe UI", sans-serif' }}
@@ -127,37 +154,28 @@ function Leaderboard({
       {/* Data */}
       {!isLoading && !errorMessage && data && (
         <>
-          {/* Entries list */}
-          <div className="space-y-2">
-            {data.entries.length ? (
-              data.entries.map((entry) => (
-                <EntryRow key={`${entry.rank}-${entry.fullName}`} entry={entry} />
-              ))
-            ) : (
-              <div className="flex flex-col items-center gap-3 py-12 text-center">
-                <div className="h-[120px] w-[120px] rounded-[24px] bg-gray-100" />
-                <p className="text-sm text-gray-500">Reyting uchun hali ma&apos;lumot yo&apos;q.</p>
+          {data.entries.length ? (
+            <>
+              <div className="mb-4 flex gap-3">
+                {data.entries.slice(0, 3).map((entry) => (
+                  <TopThreeCard key={`top-${entry.rank}`} entry={entry} />
+                ))}
               </div>
-            )}
-          </div>
 
-          {/* My position sticky card */}
-          <div className="sticky bottom-4 mt-4 rounded-[20px] bg-gradient-to-r from-teal-600 to-blue-600 px-4 py-3 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold text-white/70">Sizning o&apos;rningiz</p>
-                <p className="mt-0.5 text-base font-bold text-white">
-                  {data.myPosition.rank}. {data.myPosition.fullName}
-                </p>
-              </div>
-              <span
-                className="text-lg font-bold text-white"
-                style={{ fontFamily: 'Tahoma, "Segoe UI", sans-serif' }}
-              >
-                {data.myPosition.xp} XP
-              </span>
+              {data.entries.length > 3 && (
+                <div className="space-y-2">
+                  {data.entries.slice(3).map((entry) => (
+                    <RankedRow key={`rank-${entry.rank}-${entry.fullName}`} entry={entry} />
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-3 py-12 text-center">
+              <div className="h-[120px] w-[120px] rounded-[24px] bg-gray-100" />
+              <p className="text-sm text-gray-500">Reyting uchun hali ma&apos;lumot yo&apos;q.</p>
             </div>
-          </div>
+          )}
         </>
       )}
     </div>

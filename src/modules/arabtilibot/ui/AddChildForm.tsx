@@ -1,0 +1,250 @@
+import { memo, useCallback, useState } from 'react';
+
+import GenderBottomSheet from '@/modules/arabtilibot/ui/GenderBottomSheet';
+
+import { cx } from '@/utils/cx';
+
+type AddChildFormProps = {
+  onBack?: () => void;
+  onSave?: (data: { name: string; className: string; gender: 'male' | 'female' }) => void;
+  isSaving?: boolean;
+};
+
+const BackArrowIcon = memo(() => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M15 18L9 12L15 6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+));
+BackArrowIcon.displayName = 'BackArrowIcon';
+
+const UserCheckIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <circle cx="9" cy="9" r="4" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M15 17C15 14.7909 12.3137 13 9 13C5.68629 13 3 14.7909 3 17"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M16 11L19 14L22 9"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+));
+UserCheckIcon.displayName = 'UserCheckIcon';
+
+const BookReaderIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M12 6.5C12 6.5 14 5 17 5C20 5 21 6 21 6V19C21 19 20 18 17 18C14 18 12 19.5 12 19.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path
+      d="M12 6.5C12 6.5 10 5 7 5C4 5 3 6 3 6V19C3 19 4 18 7 18C10 18 12 19.5 12 19.5"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path d="M12 5V19" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+));
+BookReaderIcon.displayName = 'BookReaderIcon';
+
+const UserDetailIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <circle cx="10" cy="9" r="4" stroke="currentColor" strokeWidth="1.5" />
+    <path
+      d="M4 18C4 15.7909 6.68629 14 10 14C13.3137 14 16 15.7909 16 18"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    <path d="M17 12H21M19 10V14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+));
+UserDetailIcon.displayName = 'UserDetailIcon';
+
+const ChevronDownIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M6 9L12 15L18 9"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+));
+ChevronDownIcon.displayName = 'ChevronDownIcon';
+
+const SaveIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path
+      d="M19 21H5C4.44772 21 4 20.5523 4 20V4C4 3.44772 4.44772 3 5 3H15L20 8V20C20 20.5523 19.5523 21 19 21Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M8 3H14V7H8V3Z"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle cx="12" cy="15" r="3" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+));
+SaveIcon.displayName = 'SaveIcon';
+
+const FlagUzIcon = memo(() => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <rect x="4" y="2" width="18" height="20" rx="2" fill="currentColor" />
+    <line x1="7" y1="6" x2="7" y2="18" stroke="white" strokeWidth="1.5" />
+  </svg>
+));
+FlagUzIcon.displayName = 'FlagUzIcon';
+
+const GENDER_LABELS: Record<string, string> = {
+  male: "O'g'il bola",
+  female: 'Qiz bola',
+};
+
+export default function AddChildForm({ onBack, onSave, isSaving = false }: AddChildFormProps) {
+  const [name, setName] = useState('');
+  const [className, setClassName] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const [showGenderSheet, setShowGenderSheet] = useState(false);
+
+  const handleGenderSelect = useCallback((g: 'male' | 'female') => {
+    setGender(g);
+    setShowGenderSheet(false);
+  }, []);
+
+  const handleSave = useCallback(() => {
+    if (!name || !className || !gender || !onSave) return;
+    onSave({ name, className, gender });
+  }, [name, className, gender, onSave]);
+
+  const canSave = name.trim().length > 0 && className.trim().length > 0 && gender !== null;
+
+  return (
+    <div className="flex min-h-dvh flex-col bg-gray-50">
+      <div className="flex items-center justify-between px-6 pt-3 text-gray-900">
+        <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
+          9:41
+        </p>
+        <div className="flex items-center gap-2">
+          <div className="flex items-end gap-px">
+            <span className="h-1.5 w-0.5 rounded-full bg-gray-900/80" />
+            <span className="h-2 w-0.5 rounded-full bg-gray-900/80" />
+            <span className="h-2.5 w-0.5 rounded-full bg-gray-900/80" />
+            <span className="h-3 w-0.5 rounded-full bg-gray-900" />
+          </div>
+          <div className="relative size-3 rounded-full border border-gray-900/70">
+            <span className="absolute inset-[3px] rounded-full bg-gray-900/80" />
+          </div>
+          <div className="flex h-3.5 w-6 items-center rounded-full border border-gray-900/70 p-0.5">
+            <span className="h-full w-4 rounded-full bg-gray-900" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 px-4 pt-2 pb-4">
+        <button type="button" onClick={onBack} className="text-gray-900" aria-label="Orqaga">
+          <BackArrowIcon />
+        </button>
+        <p className="text-lg font-bold text-gray-900">Farzand qo&apos;shish</p>
+      </div>
+
+      <div className="flex flex-col items-center px-4 pb-6">
+        <div className="relative">
+          <div className="size-[88px] rounded-full border-2 border-white bg-gray-200 shadow-md" />
+          <div className="absolute -right-0.5 -bottom-0.5 flex size-6 items-center justify-center rounded-full bg-blue-600 text-white shadow-sm">
+            <FlagUzIcon />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 px-4">
+        <div className="mb-4">
+          <label className="mb-1.5 block text-sm text-gray-700">Farzand nomi</label>
+          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+            <UserCheckIcon />
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Nomni kiriting"
+              className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-1.5 block text-sm text-gray-700">Sinfi</label>
+          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+            <BookReaderIcon />
+            <input
+              type="text"
+              value={className}
+              onChange={(e) => setClassName(e.target.value)}
+              placeholder="Kiriting"
+              className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
+            />
+          </div>
+        </div>
+
+        <div className="mb-4">
+          <label className="mb-1.5 block text-sm text-gray-700">Jinsi</label>
+          <button
+            type="button"
+            onClick={() => setShowGenderSheet(true)}
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 text-left shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]"
+          >
+            <UserDetailIcon />
+            <span className={cx('flex-1 text-sm', gender ? 'text-gray-900' : 'text-gray-400')}>
+              {gender ? GENDER_LABELS[gender] : 'Tanlang'}
+            </span>
+            <ChevronDownIcon />
+          </button>
+        </div>
+      </div>
+
+      <div className="px-4 pt-4 pb-8">
+        <button
+          type="button"
+          disabled={!canSave || isSaving}
+          onClick={handleSave}
+          className={cx(
+            'flex w-full items-center justify-center gap-2 rounded-[28px] py-4 text-base font-bold text-white shadow-[0_4px_0_0_rgb(11,79,164),0_8px_24px_-4px_rgba(18,183,229,0.44)]',
+            canSave && !isSaving ? 'bg-gradient-to-r from-blue-600 to-teal-400' : 'bg-gray-300',
+          )}
+        >
+          <SaveIcon />
+          {isSaving ? 'Saqlanmoqda...' : 'Saqlash'}
+        </button>
+      </div>
+
+      <GenderBottomSheet
+        isOpen={showGenderSheet}
+        selected={gender}
+        onSelect={handleGenderSelect}
+        onClose={() => setShowGenderSheet(false)}
+      />
+    </div>
+  );
+}

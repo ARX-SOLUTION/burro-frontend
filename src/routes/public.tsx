@@ -28,6 +28,12 @@ const BurroLeaderboardPage = lazy(() =>
   import('@/pages/BurroLeaderboardPage').then((m) => ({ default: m.BurroLeaderboardPage })),
 );
 const BurroStatisticsPage = lazy(() => import('@/pages/BurroStatisticsPage'));
+const BurroChildrenPage = lazy(() =>
+  import('@/pages/BurroChildrenPage').then((m) => ({ default: m.BurroChildrenPage })),
+);
+const BurroAddChildPage = lazy(() =>
+  import('@/pages/BurroAddChildPage').then((m) => ({ default: m.BurroAddChildPage })),
+);
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -114,6 +120,26 @@ export const publicRoutes: RouteObject[] = [
       <AuthGuard>
         <StudentGuard>
           <BurroStatisticsPage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/children',
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroChildrenPage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/children/add',
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <BurroAddChildPage />
         </StudentGuard>
       </AuthGuard>
     ),

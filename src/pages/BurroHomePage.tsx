@@ -7,6 +7,7 @@ import BottomNav from '@/modules/arabtilibot/ui/BottomNav';
 import { HomeScreen } from '@/modules/arabtilibot/ui/screens/HomeScreen';
 import { getErrorMessage } from '@/modules/common';
 
+import { LoadingIndicator } from '@/components/application/loading-indicator/loading-indicator';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const BurroHomePage = () => {
@@ -25,7 +26,27 @@ export const BurroHomePage = () => {
   );
 
   if (isLoading) {
-    return <div className="p-4 text-sm text-gray-500">Bosh sahifa yuklanmoqda...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50/95 px-4 py-10">
+        <div className="w-full max-w-xl overflow-hidden rounded-[32px] border border-slate-200/70 bg-white/90 p-10 shadow-[0_35px_80px_-35px_rgba(15,23,42,0.25)] backdrop-blur-md">
+          <div className="flex flex-col items-center gap-8 text-center">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 via-cyan-500 to-sky-500 shadow-[0_20px_60px_rgba(14,165,233,0.25)]">
+              <LoadingIndicator type="dot-circle" size="xl" />
+            </div>
+            <div>
+              <p className="text-xs tracking-[0.35em] text-teal-600 uppercase">Burro</p>
+              <h1 className="mt-4 text-3xl font-semibold tracking-tight text-slate-950">
+                Bosh sahifa yuklanmoqda...
+              </h1>
+              <p className="mt-3 max-w-lg text-sm leading-6 text-slate-500">
+                Vaqtinchalik kuting — eng yangi darslar va progress ma&apos;lumotlari tez orada
+                yuklanadi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error) {

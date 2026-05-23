@@ -2,25 +2,19 @@ import { createCrudAPI, type ListParams } from '@/modules/common';
 
 import axiosInstance from '@/services';
 
-import type {
-  AdminUpdateUserRequest,
-  ChangePasswordRequest,
-  CreateUserRequest,
-  RequestEmailChangeRequest,
-  UpdateUserRequest,
-  User,
-  VerifyEmailChangeRequest,
-} from '../types';
+import type { AdminUpdateUserRequest, UpdateUserRequest, User } from '../types';
 
 export interface GetUsersParams extends ListParams {
   search?: string;
   role?: string;
 }
 
-const crudAPI = createCrudAPI<User, CreateUserRequest, AdminUpdateUserRequest, GetUsersParams>({
-  axios: axiosInstance,
-  endpoint: '/users',
-});
+const crudAPI = createCrudAPI<User, AdminUpdateUserRequest, AdminUpdateUserRequest, GetUsersParams>(
+  {
+    axios: axiosInstance,
+    endpoint: '/users',
+  },
+);
 
 export const usersAPI = {
   getUsers: crudAPI.getAll,
@@ -37,17 +31,5 @@ export const usersAPI = {
   updateMe: async (data: UpdateUserRequest): Promise<User> => {
     const response = await axiosInstance.patch('/users/me', data);
     return response.data;
-  },
-
-  changePassword: async (data: ChangePasswordRequest): Promise<void> => {
-    await axiosInstance.patch('/users/me/password', data);
-  },
-
-  requestEmailChange: async (data: RequestEmailChangeRequest): Promise<void> => {
-    await axiosInstance.post('/users/me/email/request', data);
-  },
-
-  verifyEmailChange: async (data: VerifyEmailChangeRequest): Promise<void> => {
-    await axiosInstance.post('/users/me/email/verify', data);
   },
 };

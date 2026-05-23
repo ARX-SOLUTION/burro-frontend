@@ -14,7 +14,7 @@ const styles = {
 interface AvatarLabelGroupProps extends AvatarProps {
   size: 'sm' | 'md' | 'lg' | 'xl';
   title: string | ReactNode;
-  subtitle: string | ReactNode;
+  subtitle?: string | ReactNode;
 }
 
 export const AvatarLabelGroup = ({
@@ -30,7 +30,9 @@ export const AvatarLabelGroup = ({
       <Avatar {...props} />
       <figcaption className="min-w-0 flex-1">
         <p className={cx('text-primary', styles[props.size].title)}>{title}</p>
-        <p className={cx('truncate text-tertiary', styles[props.size].subtitle)}>{subtitle}</p>
+        {subtitle && (
+          <p className={cx('truncate text-tertiary', styles[props.size].subtitle)}>{subtitle}</p>
+        )}
       </figcaption>
     </figure>
   );

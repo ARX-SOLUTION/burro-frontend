@@ -3,7 +3,7 @@ import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { Role } from '@/modules/auth';
 
-import { AuthGuard, EmailVerifiedGuard, RoleGuard } from '@/components/guards';
+import { AuthGuard, RoleGuard } from '@/components/guards';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { SettingsLayout } from '@/layouts/SettingsLayout';
 
@@ -14,23 +14,13 @@ const UsersPage = lazy(() => import('@/pages/UsersPage').then((m) => ({ default:
 const ProfileSettingsPage = lazy(() =>
   import('@/pages/settings/ProfileSettingsPage').then((m) => ({ default: m.ProfileSettingsPage })),
 );
-const SecuritySettingsPage = lazy(() =>
-  import('@/pages/settings/SecuritySettingsPage').then((m) => ({
-    default: m.SecuritySettingsPage,
-  })),
-);
-const EmailSettingsPage = lazy(() =>
-  import('@/pages/settings/EmailSettingsPage').then((m) => ({ default: m.EmailSettingsPage })),
-);
 
 export const dashboardRoutes: RouteObject[] = [
   {
     path: 'dashboard',
     element: (
       <AuthGuard>
-        <EmailVerifiedGuard>
-          <DashboardLayout />
-        </EmailVerifiedGuard>
+        <DashboardLayout />
       </AuthGuard>
     ),
     children: [
@@ -57,14 +47,6 @@ export const dashboardRoutes: RouteObject[] = [
           {
             path: 'profile',
             element: <ProfileSettingsPage />,
-          },
-          {
-            path: 'email',
-            element: <EmailSettingsPage />,
-          },
-          {
-            path: 'security',
-            element: <SecuritySettingsPage />,
           },
         ],
       },

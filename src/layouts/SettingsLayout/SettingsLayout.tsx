@@ -1,17 +1,13 @@
 import type { Key } from 'react-aria-components';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Key01, Mail01, User01 } from '@untitledui/icons';
+import { User01 } from '@untitledui/icons';
 
 import { Tab, TabList, Tabs } from '@/components/application/tabs/tabs';
 import { Breadcrumb } from '@/components/base/breadcrumb/breadcrumb';
 import { useBreakpoint } from '@/hooks/use-breakpoint';
 import { PageContent, PageHeader, PageWrapper } from '@/layouts/DashboardLayout';
 
-const tabItems = [
-  { id: 'profile', label: 'Profile', icon: User01 },
-  { id: 'email', label: 'Email', icon: Mail01 },
-  { id: 'security', label: 'Security', icon: Key01 },
-];
+const tabItems = [{ id: 'profile', label: 'Profile', icon: User01 }];
 
 export const SettingsLayout = () => {
   const location = useLocation();

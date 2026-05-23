@@ -54,7 +54,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         tokenStorage.setTokens(data.accessToken, data.refreshToken);
         queryClient.setQueryData(userQueryKeys.profile(), data.user);
       })
-      .catch(() => {})
+      .catch(() => {
+        toast.error('Telegram authentication failed. Please try again.');
+      })
       .finally(() => {
         setIsInitiatingTelegram(false);
       });

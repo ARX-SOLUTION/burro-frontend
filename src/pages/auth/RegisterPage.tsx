@@ -6,14 +6,17 @@ import { AUTH_SEARCH_PARAMS, authAPI, buildAuthPathWithRedirect } from '@/module
 
 import { Button } from '@/components/base/buttons/button';
 import { Telegram } from '@/components/foundations/social-icons';
+import { useAuth } from '@/hooks/use-auth';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const RegisterPage = () => {
   usePageMetadata({ title: 'Create Account' });
+  const { isInitiatingTelegram } = useAuth();
   const [searchParams] = useSearchParams();
   const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const isTelegramWebApp = Boolean(window.Telegram?.WebApp?.initData);
+  const shouldShowTelegramProgress = isTelegramWebApp && isInitiatingTelegram;
 
   const onTelegramLogin = async () => {
     setIsRedirecting(true);
@@ -35,7 +38,7 @@ export const RegisterPage = () => {
           <p className="mt-2 text-md text-tertiary">Get started with your free account today.</p>
         </div>
 
-        {isTelegramWebApp ? (
+        {shouldShowTelegramProgress ? (
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8 text-center">
             <p className="text-lg font-semibold text-primary">Telegram login detected</p>
             <p className="mt-3 text-sm leading-6 text-tertiary">

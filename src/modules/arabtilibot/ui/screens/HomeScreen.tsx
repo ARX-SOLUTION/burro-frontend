@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ArrowRight, CheckCircle, ChevronDown } from '@untitledui/icons';
 
 import type { HomeDashboardData } from '@/modules/arabtilibot/types/module';
@@ -10,7 +11,7 @@ type HomeScreenProps = {
   onStartLesson: (lessonId: string) => void;
 };
 
-const MobileStatusBar = () => {
+const MobileStatusBar = memo(function MobileStatusBar() {
   return (
     <div className="flex items-center justify-between px-6 pt-3 text-white">
       <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
@@ -33,9 +34,10 @@ const MobileStatusBar = () => {
       </div>
     </div>
   );
-};
+});
+MobileStatusBar.displayName = 'MobileStatusBar';
 
-const ProfileAvatar = () => {
+const ProfileAvatar = memo(function ProfileAvatar() {
   return (
     <div className="relative size-14 shrink-0 rounded-full border-4 border-white bg-gradient-to-br from-warning-100 via-gray-25 to-success-100 shadow-md">
       <div className="absolute top-2 left-1/2 size-4 -translate-x-1/2 rounded-full bg-warning-200" />
@@ -43,18 +45,24 @@ const ProfileAvatar = () => {
       <div className="absolute bottom-1.5 left-1/2 h-6 w-8 -translate-x-1/2 rounded-t-full rounded-b-[14px] bg-teal-500/35" />
     </div>
   );
-};
+});
+ProfileAvatar.displayName = 'ProfileAvatar';
 
-const DurationIcon = () => {
+const DurationIcon = memo(function DurationIcon() {
   return (
     <span className="relative size-3 rounded-full border border-gray-400">
       <span className="absolute top-[2px] left-1/2 h-1.5 w-px -translate-x-1/2 bg-gray-400" />
       <span className="absolute top-1/2 left-1/2 h-px w-1.5 -translate-y-1/2 bg-gray-400" />
     </span>
   );
-};
+});
+DurationIcon.displayName = 'DurationIcon';
 
-export const HomeScreen = ({ data, onOpenModulesList, onStartLesson }: HomeScreenProps) => {
+export const HomeScreen = memo(function HomeScreen({
+  data,
+  onOpenModulesList,
+  onStartLesson,
+}: HomeScreenProps) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-blue-900 via-gray-blue-950 to-gray-blue-950 px-2 py-0">
       <div className="mx-auto min-h-screen w-full max-w-[402px]">
@@ -216,6 +224,4 @@ export const HomeScreen = ({ data, onOpenModulesList, onStartLesson }: HomeScree
       </div>
     </div>
   );
-};
-
-export default HomeScreen;
+});

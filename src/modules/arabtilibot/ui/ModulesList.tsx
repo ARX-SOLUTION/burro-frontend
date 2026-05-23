@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 import type { BurroModuleListItem } from '@/modules/arabtilibot/types/view';
 
 import ModuleCard from './ModuleCard';
@@ -23,7 +25,7 @@ function SkeletonRow() {
   );
 }
 
-export default function ModulesList({
+const ModulesList = memo(function ModulesList({
   modules,
   isLoading = false,
   errorMessage,
@@ -69,4 +71,6 @@ export default function ModulesList({
       ))}
     </div>
   );
-}
+});
+
+export default ModulesList;

@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 type AnswerOptionButtonProps = {
   label: string;
   isSelected: boolean;
@@ -7,32 +9,28 @@ type AnswerOptionButtonProps = {
   onSelect: () => void;
 };
 
-export const AnswerOptionButton = ({
-  label,
-  isSelected,
-  isCorrect,
-  isWrong,
-  isDisabled,
-  onSelect,
-}: AnswerOptionButtonProps) => {
-  const stateClass = isCorrect
-    ? 'border-success-500 bg-success-50 text-success-700'
-    : isWrong
-      ? 'border-error-500 bg-error-50 text-error-700'
-      : isSelected
-        ? 'border-teal-500 bg-teal-50 text-teal-700'
-        : 'border-gray-200 bg-white text-gray-700';
+export const AnswerOptionButton = memo(
+  ({ label, isSelected, isCorrect, isWrong, isDisabled, onSelect }: AnswerOptionButtonProps) => {
+    const stateClass = isCorrect
+      ? 'border-success-500 bg-success-50 text-success-700'
+      : isWrong
+        ? 'border-error-500 bg-error-50 text-error-700'
+        : isSelected
+          ? 'border-teal-500 bg-teal-50 text-teal-700'
+          : 'border-gray-200 bg-white text-gray-700';
 
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      disabled={isDisabled}
-      className={`w-full rounded-xl border py-[18px] text-[20px] leading-7 font-bold transition-colors disabled:cursor-not-allowed ${stateClass}`}
-    >
-      {label}
-    </button>
-  );
-};
+    return (
+      <button
+        type="button"
+        onClick={onSelect}
+        disabled={isDisabled}
+        className={`w-full rounded-xl border py-[18px] text-[20px] leading-7 font-bold transition-colors disabled:cursor-not-allowed ${stateClass}`}
+      >
+        {label}
+      </button>
+    );
+  },
+);
+AnswerOptionButton.displayName = 'AnswerOptionButton';
 
 export default AnswerOptionButton;

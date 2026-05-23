@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 
 import type { StudentLanguage, UpdateStudentProfileRequest } from '@/modules/arabtilibot/types/api';
 import type { BurroProfileData } from '@/modules/arabtilibot/types/view';
@@ -18,7 +18,7 @@ const LANGUAGE_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
   { id: 'ru', label: 'Русский' },
 ];
 
-function SkeletonProfile() {
+const SkeletonProfile = memo(() => {
   return (
     <div className="px-4 pt-4">
       <div className="flex h-[72px] items-center gap-3 rounded-full bg-white px-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
@@ -35,7 +35,8 @@ function SkeletonProfile() {
       </div>
     </div>
   );
-}
+});
+SkeletonProfile.displayName = 'SkeletonProfile';
 
 export default function Profile({
   profile,
@@ -47,6 +48,57 @@ export default function Profile({
 }: ProfileProps) {
   const [editLanguage, setEditLanguage] = useState<StudentLanguage | null>(null);
   const [editNotifications, setEditNotifications] = useState<boolean | null>(null);
+
+  const currentLanguage = editLanguage ?? profile?.language ?? 'uz';
+  const currentNotifications = editNotifications ?? profile?.notificationsEnabled ?? false;
+
+  const isDirty = useMemo(
+    () =>
+      !!profile &&
+      ((editLanguage !== null && editLanguage !== profile.language) ||
+        (editNotifications !== null && editNotifications !== profile.notificationsEnabled)),
+    [editLanguage, editNotifications, profile],
+  );
+
+  const infoRows = useMemo(
+    () =>
+      profile
+        ? [
+            { label: 'Jami XP', value: `${profile.xpTotal} XP` },
+            { label: 'Streak', value: `${profile.currentStreak} kun ketma-ket` },
+            { label: 'Eng uzun streak', value: `${profile.longestStreak} kun` },
+            { label: 'Tamomlangan modullar', value: `${profile.completedModules} ta` },
+            { label: 'Umumiy aniqlik', value: `${profile.accuracyPct}%` },
+            { label: 'Telegram', value: profile.telegramLinked ? 'Ulangan' : 'Ulanmagan' },
+          ]
+        : [],
+    [profile],
+  );
+
+  const handleLanguageSelect = useCallback((language: StudentLanguage) => {
+    setEditLanguage(language);
+  }, []);
+
+  const handleToggleNotifications = useCallback(() => {
+    setEditNotifications((prev) => (prev !== null ? !prev : !currentNotifications));
+  }, [currentNotifications]);
+
+  const handleSave = useCallback(() => {
+    if (!onSave || !profile) return;
+
+    const payload: UpdateStudentProfileRequest = {
+      ...(editLanguage !== null && editLanguage !== profile.language
+        ? { language: editLanguage }
+        : {}),
+      ...(editNotifications !== null && editNotifications !== profile.notificationsEnabled
+        ? { notifications_enabled: editNotifications }
+        : {}),
+    };
+
+    if (Object.keys(payload).length > 0) {
+      onSave(payload);
+    }
+  }, [editLanguage, editNotifications, onSave, profile]);
 
   if (isLoading) return <SkeletonProfile />;
 
@@ -74,21 +126,6 @@ export default function Profile({
       </div>
     );
   }
-
-  const currentLanguage = editLanguage ?? profile.language;
-  const currentNotifications = editNotifications ?? profile.notificationsEnabled;
-  const isDirty =
-    (editLanguage !== null && editLanguage !== profile.language) ||
-    (editNotifications !== null && editNotifications !== profile.notificationsEnabled);
-
-  const infoRows = [
-    { label: 'Jami XP', value: `${profile.xpTotal} XP` },
-    { label: 'Streak', value: `${profile.currentStreak} kun ketma-ket` },
-    { label: 'Eng uzun streak', value: `${profile.longestStreak} kun` },
-    { label: 'Tamomlangan modullar', value: `${profile.completedModules} ta` },
-    { label: 'Umumiy aniqlik', value: `${profile.accuracyPct}%` },
-    { label: 'Telegram', value: profile.telegramLinked ? 'Ulangan' : 'Ulanmagan' },
-  ];
 
   return (
     <div className="px-4 pt-4 pb-8">
@@ -132,7 +169,7 @@ export default function Profile({
               <button
                 key={opt.id}
                 type="button"
-                onClick={() => setEditLanguage(opt.id)}
+                onClick={() => handleLanguageSelect(opt.id)}
                 className={`rounded-full px-3 py-1.5 text-xs font-bold transition-colors ${
                   currentLanguage === opt.id
                     ? 'bg-teal-600 text-white'
@@ -150,7 +187,7 @@ export default function Profile({
             type="button"
             role="switch"
             aria-checked={currentNotifications}
-            onClick={() => setEditNotifications(!currentNotifications)}
+            onClick={handleToggleNotifications}
             className={`relative h-7 w-12 rounded-full transition-colors ${
               currentNotifications ? 'bg-teal-500' : 'bg-gray-200'
             }`}
@@ -168,16 +205,7 @@ export default function Profile({
         <button
           type="button"
           disabled={isSaving}
-          onClick={() =>
-            onSave({
-              ...(editLanguage !== null && editLanguage !== profile.language
-                ? { language: editLanguage }
-                : {}),
-              ...(editNotifications !== null && editNotifications !== profile.notificationsEnabled
-                ? { notifications_enabled: editNotifications }
-                : {}),
-            })
-          }
+          onClick={handleSave}
           className="mt-3 w-full rounded-[28px] bg-teal-600 py-3.5 text-sm font-bold text-white shadow-[0_4px_0_0_rgba(15,118,110,1)] disabled:opacity-60"
         >
           {isSaving ? 'Saqlanmoqda…' : 'Sozlamalarni saqlash'}

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { mapProfileToView } from '@/modules/arabtilibot/libs/mappers';
 import { useStudentProfile } from '@/modules/arabtilibot/services/useStudentProfile';
@@ -21,10 +21,29 @@ export const BurroProfilePage = () => {
     return mapProfileToView(profileQuery.data, statisticsQuery.data);
   }, [profileQuery.data, statisticsQuery.data]);
 
-  const error =
-    profileQuery.error || statisticsQuery.error
-      ? getErrorMessage(profileQuery.error || statisticsQuery.error, 'Profilni yuklab bo‘lmadi')
-      : null;
+  const error = useMemo(
+    () =>
+      profileQuery.error || statisticsQuery.error
+        ? getErrorMessage(profileQuery.error || statisticsQuery.error, 'Profilni yuklab bo‘lmadi')
+        : null,
+    [profileQuery.error, statisticsQuery.error],
+  );
+
+  const { mutateAsync } = updateMutation;
+  const { refetch: refetchProfile } = profileQuery;
+  const { refetch: refetchStatistics } = statisticsQuery;
+
+  const handleSave = useCallback(
+    (data: Parameters<typeof mutateAsync>[0]) => {
+      void mutateAsync(data);
+    },
+    [mutateAsync],
+  );
+
+  const handleRetry = useCallback(() => {
+    void refetchProfile();
+    void refetchStatistics();
+  }, [refetchProfile, refetchStatistics]);
 
   return (
     <>
@@ -34,11 +53,8 @@ export const BurroProfilePage = () => {
           isLoading={profileQuery.isLoading || statisticsQuery.isLoading}
           isSaving={updateMutation.isPending}
           errorMessage={error}
-          onSave={(data) => void updateMutation.mutateAsync(data)}
-          onRetry={() => {
-            void profileQuery.refetch();
-            void statisticsQuery.refetch();
-          }}
+          onSave={handleSave}
+          onRetry={handleRetry}
         />
       </div>
       <BottomNav />

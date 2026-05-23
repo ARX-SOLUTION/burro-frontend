@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { mapStudentHomeToDashboardData } from '@/modules/arabtilibot/libs/mappers';
@@ -13,6 +14,15 @@ export const BurroHomePage = () => {
 
   const navigate = useNavigate();
   const { data, isLoading, error, refetch } = useStudentHome();
+
+  const dashboardData = useMemo(() => (data ? mapStudentHomeToDashboardData(data) : null), [data]);
+
+  const handleOpenModulesList = useCallback(() => navigate('/burro/modules'), [navigate]);
+
+  const handleStartLesson = useCallback(
+    (lessonId: string) => navigate(lessonId ? `/burro/practice/${lessonId}` : '/burro/modules'),
+    [navigate],
+  );
 
   if (isLoading) {
     return <div className="p-4 text-sm text-gray-500">Bosh sahifa yuklanmoqda...</div>;
@@ -39,17 +49,14 @@ export const BurroHomePage = () => {
     return <div className="p-4 text-sm text-gray-500">Bosh sahifa ma&apos;lumoti topilmadi.</div>;
   }
 
-  const dashboardData = mapStudentHomeToDashboardData(data);
   const hasModules = !!data.continue_module || data.recent_modules.length > 0;
 
   return (
     <div className="pb-28">
       <HomeScreen
-        data={dashboardData}
-        onOpenModulesList={() => navigate('/burro/modules')}
-        onStartLesson={(lessonId) =>
-          navigate(lessonId ? `/burro/practice/${lessonId}` : '/burro/modules')
-        }
+        data={dashboardData!}
+        onOpenModulesList={handleOpenModulesList}
+        onStartLesson={handleStartLesson}
       />
       {!hasModules && (
         <div className="mx-auto mt-4 max-w-[402px] px-4">

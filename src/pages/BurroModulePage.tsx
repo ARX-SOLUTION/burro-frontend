@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { mapModulesToListItems } from '@/modules/arabtilibot/libs/mappers';
@@ -18,22 +18,36 @@ export const BurroModulePage = () => {
 
   const modules = useMemo(() => (data ? mapModulesToListItems(data) : []), [data]);
 
+  const filterOptions = useMemo(
+    () =>
+      [
+        ['all', 'Barchasi'],
+        ['open', 'Ochiq'],
+        ['completed', 'Tamomlangan'],
+      ] as Array<[ModuleFilter, string]>,
+    [],
+  );
+
+  const handleStart = useCallback((id: string) => navigate(`/burro/practice/${id}`), [navigate]);
+
+  const handleRetry = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
+  const handleFilterChange = useCallback((value: ModuleFilter) => {
+    setFilter(value);
+  }, []);
+
   return (
     <>
       <div className="p-4 pb-28">
         <h1 className="mb-4 text-xl font-semibold">Modullar</h1>
         <div className="mb-4 flex gap-2">
-          {(
-            [
-              ['all', 'Barchasi'],
-              ['open', 'Ochiq'],
-              ['completed', 'Tamomlangan'],
-            ] as Array<[ModuleFilter, string]>
-          ).map(([value, label]) => (
+          {filterOptions.map(([value, label]) => (
             <button
               key={value}
               type="button"
-              onClick={() => setFilter(value)}
+              onClick={() => handleFilterChange(value)}
               className={`rounded-full px-3 py-2 text-sm font-semibold ${filter === value ? 'bg-teal-600 text-white' : 'bg-white text-gray-600'}`}
             >
               {label}
@@ -44,8 +58,8 @@ export const BurroModulePage = () => {
           modules={modules}
           isLoading={isLoading}
           errorMessage={error ? getErrorMessage(error, 'Modullarni yuklab bo‘lmadi') : null}
-          onRetry={() => refetch()}
-          onStart={(id) => navigate(`/burro/practice/${id}`)}
+          onRetry={handleRetry}
+          onStart={handleStart}
         />
       </div>
       <BottomNav />

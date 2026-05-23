@@ -20,6 +20,7 @@ type AuthContextType = {
   refreshUser: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitiatingTelegram: boolean;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -100,6 +101,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         refreshUser,
         isAuthenticated,
         isLoading,
+        isInitiatingTelegram,
       }}
     >
       {children}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AUTH_SEARCH_PARAMS } from '@/modules/auth';
 
 import { Button } from '@/components/base/buttons/button';
+import { APP_VERSION } from '@/libs/version';
 
 type Variant = 'default' | 'figma-3-50' | 'figma-3-51';
 
@@ -97,6 +98,8 @@ export default function Welcome({ variant = 'default' }: { variant?: Variant }) 
               Keyinroq
             </button>
           </div>
+
+          <p className="pb-2 text-center text-[10px] text-white/30">v{APP_VERSION}</p>
         </div>
       </div>
     </div>

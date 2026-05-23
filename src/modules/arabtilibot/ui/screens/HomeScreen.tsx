@@ -4,6 +4,7 @@ import { ArrowRight, CheckCircle, ChevronDown } from '@untitledui/icons';
 import type { HomeDashboardData } from '@/modules/arabtilibot/types/module';
 
 import { Button } from '@/components/base/buttons/button';
+import { APP_VERSION } from '@/libs/version';
 
 type ChildCard = {
   id: string;
@@ -282,6 +283,8 @@ export const HomeScreen = memo(function HomeScreen({
             </div>
           </section>
         </div>
+
+        <p className="pb-4 text-center text-[10px] text-white/30">v{APP_VERSION}</p>
       </div>
     </div>
   );

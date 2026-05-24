@@ -8,7 +8,6 @@ import BottomNav from '@/modules/arabtilibot/ui/BottomNav';
 import Profile from '@/modules/arabtilibot/ui/Profile';
 import { useLogoutMutation } from '@/modules/auth/services/useLogoutMutation';
 import { getErrorMessage } from '@/modules/common';
-import { useParentSwitch } from '@/modules/parent';
 
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
@@ -52,11 +51,6 @@ export const BurroProfilePage = () => {
     logoutMutation.mutate();
   }, [logoutMutation]);
 
-  const switchMutation = useParentSwitch();
-  const handleParentSwitch = useCallback(() => {
-    switchMutation.mutate();
-  }, [switchMutation]);
-
   return (
     <>
       <div className="pb-28">
@@ -68,7 +62,6 @@ export const BurroProfilePage = () => {
           onSave={handleSave}
           onRetry={handleRetry}
           onLogout={handleLogout}
-          onParentSwitch={handleParentSwitch}
         />
       </div>
       <BottomNav />

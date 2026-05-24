@@ -11,7 +11,6 @@ type ProfileProps = {
   onRetry?: () => void;
   onSave?: (data: UpdateStudentProfileRequest) => void;
   onLogout?: () => void;
-  onParentSwitch?: () => void;
 };
 
 const LANGUAGE_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
@@ -53,7 +52,6 @@ export default function Profile({
   onRetry,
   onSave,
   onLogout,
-  onParentSwitch,
 }: ProfileProps) {
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -162,14 +160,6 @@ export default function Profile({
           <span className="text-sm text-error-500">Chiqish</span>
         </div>
       </div>
-
-      <button
-        type="button"
-        onClick={onParentSwitch}
-        className="mt-6 w-full rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-button"
-      >
-        Ota-ona rejimiga o&apos;tish
-      </button>
 
       {showLanguageSheet && (
         <div

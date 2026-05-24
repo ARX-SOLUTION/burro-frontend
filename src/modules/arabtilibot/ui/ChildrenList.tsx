@@ -1,7 +1,7 @@
 import { memo } from 'react';
 import { ArrowLeft, Edit03, Plus, Users02 } from '@untitledui/icons';
 
-import type { ChildrenListProps } from '@/modules/arabtilibot/types/children';
+import type { ChildCard, ChildrenListProps } from '@/modules/arabtilibot/types/children';
 
 const ChildCardComponent = memo(function ChildCardComponent({
   child,

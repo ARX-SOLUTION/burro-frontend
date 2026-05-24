@@ -88,7 +88,6 @@ export default function PracticePlayer() {
     if (!moduleId) return;
 
     setAttemptId('');
-    setFinishSummary(null);
     setAnsweredQuestionIds([]);
     setFeedback(null);
     setSelected(null);

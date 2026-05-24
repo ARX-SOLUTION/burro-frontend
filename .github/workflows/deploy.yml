@@ -7,8 +7,9 @@ on:
 
 env:
   DEPLOY_PATH: /var/www/burro
-  SSH_HOST: ${{ secrets.SSH_HOST }}
-  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_HOST: ${{ secrets.SSH_HOST || secrets.SERVER_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER || 'root' }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY || secrets.SERVER_SSH_KEY }}
 
 jobs:
   build:
@@ -83,18 +84,31 @@ jobs:
 
       - name: Setup SSH
         run: |
+          set -euo pipefail
+          if [ -z "${SSH_HOST:-}" ]; then
+            echo "::error::Missing SSH_HOST secret. Set SSH_HOST, or keep legacy SERVER_HOST."
+            exit 1
+          fi
+          if [ -z "${SSH_USER:-}" ]; then
+            echo "::error::Missing SSH_USER secret."
+            exit 1
+          fi
+          if [ -z "${SSH_PRIVATE_KEY:-}" ]; then
+            echo "::error::Missing SSH_PRIVATE_KEY secret. Set SSH_PRIVATE_KEY, or keep legacy SERVER_SSH_KEY."
+            exit 1
+          fi
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ env.SSH_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H "$SSH_HOST" >> ~/.ssh/known_hosts
 
       - name: Upload tarball to server
         run: |
-          scp release.tar.gz ${{ env.SSH_USER }}@${{ env.SSH_HOST }}:/tmp/burro-release.tar.gz
+          scp release.tar.gz "$SSH_USER@$SSH_HOST:/tmp/burro-release.tar.gz"
 
       - name: Extract and deploy
         run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} << 'EOF'
+          ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             set -e
 
             # Prepare target dirs
@@ -128,7 +142,7 @@ jobs:
 
       - name: Health check
         run: |
-          ssh ${{ env.SSH_USER }}@${{ env.SSH_HOST }} << 'EOF'
+          ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             check() {
               local name=$1
               local path=$2

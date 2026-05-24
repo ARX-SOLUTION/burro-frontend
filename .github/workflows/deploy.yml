@@ -10,6 +10,9 @@ concurrency:
 
 env:
   NODE_VERSION: '20'
+  DEPLOY_DIR: /root/projects/burro/burro-frontend
+  SSH_RETRIES: 5
+  SSH_RETRY_DELAY: 10
 
 jobs:
   build-and-deploy:
@@ -37,14 +40,33 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
 
+      - name: Test SSH connectivity
+        uses: nick-invision/retry@v3
+        with:
+          timeout_minutes: 2
+          max_attempts: ${{ env.SSH_RETRIES }}
+          retry_wait_seconds: ${{ env.SSH_RETRY_DELAY }}
+          command: |
+            ssh -o StrictHostKeyChecking=no \
+                -o ConnectTimeout=10 \
+                -o ServerAliveInterval=5 \
+                -o ServerAliveCountMax=3 \
+                -i <(echo "${{ secrets.SERVER_SSH_KEY }}") \
+                -p 22 \
+                root@${{ secrets.SERVER_HOST }} \
+                "echo 'SSH connection successful'"
+
       - name: Copy dist to server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 120s
           source: dist/
-          target: /root/projects/burro/burro-frontend/
+          target: ${{ env.DEPLOY_DIR }}/
           rm: true
           strip_components: 0
 
@@ -54,6 +76,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          timeout: 60s
+          command_timeout: 30s
           script: |
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -66,6 +91,9 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          timeout: 90s
+          command_timeout: 90s
           script: |
             for i in $(seq 1 12); do
               STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:5173/ 2>/dev/null || echo "000")

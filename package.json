@@ -1,86 +1,18 @@
 {
-  "name": "frontend-template",
-  "version": "1.1.0",
-  "type": "module",
+  "name": "burro-monorepo",
   "private": true,
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 5173",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview --host 127.0.0.1 --port 5173",
-    "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
-    "lint:check": "eslint \"src/**/*.{ts,tsx}\"",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
-    "type-check": "tsc --noEmit",
-    "test:e2e": "playwright test --config=playwright.config.ts",
-    "test:e2e:legacy": "node scripts/run-playwright.mjs",
-    "generate:module": "node scripts/generate-module.cjs",
-    "prepare": "husky"
-  },
-  "lint-staged": {
-    "src/**/*.{ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
-  },
-  "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
-    "@internationalized/date": "^3.10.1",
-    "@react-aria/utils": "^3.32.0",
-    "@react-stately/utils": "^3.11.0",
-    "@react-types/overlays": "^3.9.2",
-    "@react-types/shared": "^3.32.1",
-    "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.18",
-    "@tanstack/react-query": "^5.90.12",
-    "@untitledui/file-icons": "^0.0.8",
-    "@untitledui/icons": "^0.0.19",
-    "axios": "^1.13.2",
-    "date-fns": "^4.1.0",
-    "input-otp": "^1.4.2",
-    "motion": "^12.23.26",
-
-    "qr-code-styling": "^1.9.2",
-    "react": "^19.2.3",
-    "react-aria": "^3.44.0",
-    "react-aria-components": "^1.13.0",
-    "react-dom": "^19.2.3",
-    "react-hook-form": "^7.69.0",
-
-    "react-router-dom": "^7.1.1",
-    "react-stately": "^3.43.0",
-    "sonner": "^2.0.7",
-    "tailwind-merge": "^3.4.0",
-    "tailwindcss": "^4.1.18",
-    "tailwindcss-animate": "^1.0.7",
-    "tailwindcss-react-aria-components": "^2.0.1",
-    "zod": "^4.2.1"
+    "dev": "pnpm --parallel -r dev",
+    "dev:student": "pnpm --filter @burro/student dev",
+    "dev:parent": "pnpm --filter @burro/parent dev",
+    "dev:admin": "pnpm --filter @burro/admin dev",
+    "build": "pnpm -r build",
+    "build:student": "pnpm --filter @burro/student build",
+    "build:parent": "pnpm --filter @burro/parent build",
+    "build:admin": "pnpm --filter @burro/admin build",
+    "install:all": "pnpm install"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@playwright/test": "^1.58.2",
-
-    "@types/node": "^24.10.4",
-
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "@typescript-eslint/eslint-plugin": "^8.19.0",
-    "@typescript-eslint/parser": "^8.19.0",
-    "@vitejs/plugin-react-swc": "^4.2.2",
-    "eslint": "^9.17.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-react": "^7.37.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-simple-import-sort": "^12.1.1",
-    "globals": "^16.5.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.3.0",
-    "playwright": "^1.58.2",
-    "prettier": "^3.7.4",
-    "prettier-plugin-tailwindcss": "^0.6.14",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0",
-    "vite": "^7.3.0"
+    "typescript": "^5.0.0"
   }
 }

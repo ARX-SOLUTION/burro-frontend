@@ -1,0 +1,22 @@
+{
+  "name": "@burro/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./modules/auth": "./src/modules/auth/index.ts",
+    "./modules/common": "./src/modules/common/index.ts",
+    "./modules/users": "./src/modules/users/index.ts",
+    "./modules/auth/*": "./src/modules/auth/*",
+    "./modules/common/*": "./src/modules/common/*",
+    "./modules/users/*": "./src/modules/users/*",
+    "./libs/*": "./src/libs/*",
+    "./types/*": "./src/types/*",
+    "./hooks/*": "./src/hooks/*",
+    "./services/*": "./src/services/*",
+    "./utils/*": "./src/utils/*",
+    "./components/*": "./src/components/*",
+    "./*": "./src/*"
+  }
+}

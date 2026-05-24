@@ -1,29 +1,35 @@
-const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'access_token',
-  REFRESH_TOKEN: 'refresh_token',
-} as const;
+let accessToken: string | null = null;
+let refreshToken: string | null = null;
 
 export const tokenStorage = {
-  getAccessToken: (): string | null => {
-    return localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
+  getAccessToken: () => accessToken,
+
+  getRefreshToken: () => refreshToken,
+
+  setAccessToken: (token: string | null) => {
+    accessToken = token;
   },
 
-  getRefreshToken: (): string | null => {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
+  setRefreshToken: (token: string | null) => {
+    refreshToken = token;
   },
 
-  setTokens: (accessToken: string, refreshToken: string): void => {
-    localStorage.setItem(STORAGE_KEYS.ACCESS_TOKEN, accessToken);
-    localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+  setTokens: (access: string, refresh: string) => {
+    accessToken = access;
+    refreshToken = refresh;
   },
 
-  clearTokens: (): void => {
-    localStorage.removeItem(STORAGE_KEYS.ACCESS_TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+  clearTokens: () => {
+    accessToken = null;
+    refreshToken = null;
+  },
+
+  clear: () => {
+    accessToken = null;
+    refreshToken = null;
   },
 
   hasValidToken: (): boolean => {
-    const token = localStorage.getItem(STORAGE_KEYS.ACCESS_TOKEN);
-    return !!token;
+    return !!accessToken;
   },
 };

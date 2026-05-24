@@ -24,7 +24,7 @@ const TopThreeCard = memo(function TopThreeCard({ entry }: { entry: BurroLeaderb
   const medal = MEDAL[entry.rank];
   return (
     <div
-      className={`flex flex-1 flex-col items-center gap-2 rounded-[20px] bg-white px-4 py-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)] ${
+      className={`flex flex-1 flex-col items-center gap-2 rounded-[20px] bg-white px-4 py-4 shadow-card ${
         entry.isCurrentUser ? 'ring-2 ring-teal-400' : ''
       }`}
     >
@@ -34,7 +34,12 @@ const TopThreeCard = memo(function TopThreeCard({ entry }: { entry: BurroLeaderb
 
       <div className="size-12 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-teal-200 to-blue-300">
         {entry.avatarUrl && (
-          <img src={entry.avatarUrl} alt={entry.fullName} className="size-full object-cover" />
+          <img
+            src={entry.avatarUrl}
+            alt={entry.fullName}
+            loading="lazy"
+            className="size-full object-cover"
+          />
         )}
       </div>
 
@@ -58,7 +63,7 @@ const TopThreeCard = memo(function TopThreeCard({ entry }: { entry: BurroLeaderb
 const RankedRow = memo(function RankedRow({ entry }: { entry: BurroLeaderboardEntry }) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)] ${
+      className={`flex items-center gap-3 rounded-[20px] bg-white px-4 py-3 shadow-card ${
         entry.isCurrentUser ? 'ring-2 ring-teal-400' : ''
       }`}
     >
@@ -68,7 +73,12 @@ const RankedRow = memo(function RankedRow({ entry }: { entry: BurroLeaderboardEn
 
       <div className="size-10 shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-teal-200 to-blue-300">
         {entry.avatarUrl && (
-          <img src={entry.avatarUrl} alt={entry.fullName} className="size-full object-cover" />
+          <img
+            src={entry.avatarUrl}
+            alt={entry.fullName}
+            loading="lazy"
+            className="size-full object-cover"
+          />
         )}
       </div>
 

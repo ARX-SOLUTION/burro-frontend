@@ -148,11 +148,7 @@ export default function BurroStatisticsPage() {
                     className="flex items-center justify-between"
                   >
                     <div className="flex items-center gap-3">
-                      <span
-                        className="text-3xl font-bold text-white"
-                        dir="rtl"
-                        style={{ fontFamily: '"Scheherazade New", serif' }}
-                      >
+                      <span className="font-arabic text-3xl font-bold text-white" dir="rtl">
                         {letter.arabic}
                       </span>
                       <span className="text-sm text-white/60">{letter.sound}</span>

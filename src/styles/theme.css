@@ -1335,3 +1335,15 @@
         --outline-color-brand_alt: var(--color-border-brand_alt);
     }
 }
+
+@utility shadow-card {
+  box-shadow: 0 2px 0 0 rgb(172 173 176), inset 0 0 6px 0 rgb(255 255 255 / 0.63);
+}
+
+@utility shadow-button {
+  box-shadow: 0 4px 0 0 rgb(11 79 164), 0 8px 24px -4px rgb(18 183 229 / 0.44);
+}
+
+@utility font-arabic {
+  font-family: 'Scheherazade New', serif;
+}

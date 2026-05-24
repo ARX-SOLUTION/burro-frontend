@@ -43,7 +43,7 @@ export const ArabTiliBotLessonPlayFigma: React.FC = () => {
         {/* Card */}
         <div className="mt-12 overflow-hidden rounded-md bg-white shadow-xl">
           <div className="bg-[#f9fafb] p-6 pt-24 pb-32 text-center">
-            <h2 className="mb-6 text-lg font-semibold text-[#374151]">
+            <h2 className="mb-6 text-lg font-semibold text-gray-700">
               Qaysi tovush to&#39;g&#39;ri keladi?
             </h2>
 
@@ -57,7 +57,7 @@ export const ArabTiliBotLessonPlayFigma: React.FC = () => {
                     <Button
                       onClick={() => !answered && setSelected(opt.key)}
                       data-selected={isSelected ? 'true' : undefined}
-                      className={`w-full rounded-[12px] py-4 font-bold ${isSelected ? 'border-transparent bg-[#0D9488] text-white' : 'border border-gray-200 bg-white text-[#374151]'}`}
+                      className={`w-full rounded-[12px] py-4 font-bold ${isSelected ? 'border-transparent bg-teal-600 text-white' : 'border border-gray-200 bg-white text-gray-700'}`}
                       aria-pressed={isSelected}
                     >
                       {opt.label}

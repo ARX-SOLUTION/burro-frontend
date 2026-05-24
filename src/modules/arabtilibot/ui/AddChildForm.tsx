@@ -1,12 +1,23 @@
 import { memo, useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
 import GenderBottomSheet from '@/modules/arabtilibot/ui/GenderBottomSheet';
 
 import { cx } from '@/utils/cx';
 
+const addChildSchema = z.object({
+  name: z.string().min(1, 'Nomni kiriting'),
+  className: z.string().min(1, 'Sinfni kiriting'),
+  gender: z.enum(['male', 'female']),
+});
+
+type AddChildFormData = z.infer<typeof addChildSchema>;
+
 type AddChildFormProps = {
   onBack?: () => void;
-  onSave?: (data: { name: string; className: string; gender: 'male' | 'female' }) => void;
+  onSave?: (data: AddChildFormData) => void;
   isSaving?: boolean;
 };
 
@@ -124,22 +135,35 @@ const GENDER_LABELS: Record<string, string> = {
 };
 
 export default function AddChildForm({ onBack, onSave, isSaving = false }: AddChildFormProps) {
-  const [name, setName] = useState('');
-  const [className, setClassName] = useState('');
-  const [gender, setGender] = useState<'male' | 'female' | null>(null);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { isValid },
+  } = useForm<AddChildFormData>({
+    resolver: zodResolver(addChildSchema),
+    defaultValues: { name: '', className: '', gender: undefined },
+    mode: 'onChange',
+  });
+
+  const gender = watch('gender');
   const [showGenderSheet, setShowGenderSheet] = useState(false);
 
-  const handleGenderSelect = useCallback((g: 'male' | 'female') => {
-    setGender(g);
-    setShowGenderSheet(false);
-  }, []);
+  const handleGenderSelect = useCallback(
+    (g: 'male' | 'female') => {
+      setValue('gender', g, { shouldValidate: true });
+      setShowGenderSheet(false);
+    },
+    [setValue],
+  );
 
-  const handleSave = useCallback(() => {
-    if (!name || !className || !gender || !onSave) return;
-    onSave({ name, className, gender });
-  }, [name, className, gender, onSave]);
-
-  const canSave = name.trim().length > 0 && className.trim().length > 0 && gender !== null;
+  const onSubmit = useCallback(
+    (data: AddChildFormData) => {
+      onSave?.(data);
+    },
+    [onSave],
+  );
 
   return (
     <div className="flex min-h-dvh flex-col bg-gray-50">
@@ -182,12 +206,11 @@ export default function AddChildForm({ onBack, onSave, isSaving = false }: AddCh
       <div className="flex-1 px-4">
         <div className="mb-4">
           <label className="mb-1.5 block text-sm text-gray-700">Farzand nomi</label>
-          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-card">
             <UserCheckIcon />
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register('name')}
               placeholder="Nomni kiriting"
               className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
             />
@@ -196,12 +219,11 @@ export default function AddChildForm({ onBack, onSave, isSaving = false }: AddCh
 
         <div className="mb-4">
           <label className="mb-1.5 block text-sm text-gray-700">Sinfi</label>
-          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+          <div className="flex items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 shadow-card">
             <BookReaderIcon />
             <input
               type="text"
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
+              {...register('className')}
               placeholder="Kiriting"
               className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
             />
@@ -213,7 +235,7 @@ export default function AddChildForm({ onBack, onSave, isSaving = false }: AddCh
           <button
             type="button"
             onClick={() => setShowGenderSheet(true)}
-            className="flex w-full items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 text-left shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]"
+            className="flex w-full items-center gap-3 rounded-[20px] bg-white px-4 py-3.5 text-left shadow-card"
           >
             <UserDetailIcon />
             <span className={cx('flex-1 text-sm', gender ? 'text-gray-900' : 'text-gray-400')}>
@@ -227,11 +249,11 @@ export default function AddChildForm({ onBack, onSave, isSaving = false }: AddCh
       <div className="px-4 pt-4 pb-8">
         <button
           type="button"
-          disabled={!canSave || isSaving}
-          onClick={handleSave}
+          disabled={!isValid || isSaving}
+          onClick={handleSubmit(onSubmit)}
           className={cx(
-            'flex w-full items-center justify-center gap-2 rounded-[28px] py-4 text-base font-bold text-white shadow-[0_4px_0_0_rgb(11,79,164),0_8px_24px_-4px_rgba(18,183,229,0.44)]',
-            canSave && !isSaving ? 'bg-gradient-to-r from-blue-600 to-teal-400' : 'bg-gray-300',
+            'flex w-full items-center justify-center gap-2 rounded-[28px] py-4 text-base font-bold text-white shadow-button',
+            isValid && !isSaving ? 'bg-gradient-to-r from-blue-600 to-teal-400' : 'bg-gray-300',
           )}
         >
           <SaveIcon />

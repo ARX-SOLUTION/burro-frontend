@@ -28,7 +28,7 @@ const BOTTOM_SHEET_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
 const SkeletonProfile = memo(() => {
   return (
     <div className="px-4 pt-4">
-      <div className="flex h-[72px] items-center gap-3 rounded-full bg-white px-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+      <div className="flex h-[72px] items-center gap-3 rounded-full bg-white px-4 shadow-card">
         <div className="size-11 animate-pulse rounded-full bg-gray-100" />
         <div className="space-y-2">
           <div className="h-4 w-32 animate-pulse rounded-full bg-gray-100" />
@@ -48,7 +48,6 @@ SkeletonProfile.displayName = 'SkeletonProfile';
 export default function Profile({
   profile,
   isLoading = false,
-  isSaving: _isSaving = false,
   errorMessage,
   onRetry,
   onSave,
@@ -107,7 +106,7 @@ export default function Profile({
 
   return (
     <div className="px-4 pt-4 pb-8">
-      <div className="flex h-[72px] items-center justify-between overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-gray-25 via-white to-gray-200 px-3 pr-4 shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+      <div className="flex h-[72px] items-center justify-between overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-gray-25 via-white to-gray-200 px-3 pr-4 shadow-card">
         <div className="flex items-center gap-3">
           <div className="relative size-11 shrink-0 rounded-full border-2 border-white bg-gradient-to-br from-warning-100 via-gray-50 to-success-100 shadow-sm" />
           <div>
@@ -121,7 +120,7 @@ export default function Profile({
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-[20px] bg-white shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)]">
+      <div className="mt-4 overflow-hidden rounded-[20px] bg-white shadow-card">
         <div className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4">
           <span className="text-sm text-gray-700">Statistika</span>
           <span className="text-sm font-semibold text-teal-600">Batafsil</span>
@@ -169,7 +168,7 @@ export default function Profile({
 
       <button
         type="button"
-        className="mt-6 w-full rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-[0_4px_0_0_rgb(11,79,164),0_8px_24px_-4px_rgba(18,183,229,0.44)]"
+        className="mt-6 w-full rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-button"
       >
         Ota-ona rejimiga o&apos;tish
       </button>

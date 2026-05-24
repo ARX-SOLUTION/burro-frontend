@@ -8,7 +8,6 @@ type ProfileProps = {
   isLoading?: boolean;
   isSaving?: boolean;
   errorMessage?: string | null;
-  childrenCount?: number;
   onRetry?: () => void;
   onSave?: (data: UpdateStudentProfileRequest) => void;
   onLogout?: () => void;
@@ -51,7 +50,6 @@ export default function Profile({
   profile,
   isLoading = false,
   errorMessage,
-  childrenCount,
   onRetry,
   onSave,
   onLogout,

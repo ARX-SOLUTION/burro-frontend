@@ -97,6 +97,9 @@ export const ParentDashboardPage = () => {
                   Qo&apos;shish
                 </button>
               </div>
+              <p className="mt-2 text-xs text-gray-400">
+                ID ni o&apos;quvchi profilining sozlamalar bo&apos;limidan topishingiz mumkin
+              </p>
             </div>
           )}
 

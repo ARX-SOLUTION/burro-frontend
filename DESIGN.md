@@ -23,6 +23,7 @@ A parent registers via Telegram OAuth, then adds one or more children. The Paren
 - Can add/edit/remove children.
 - Can change app language.
 - Can toggle notifications.
+- Can switch between own profile and child monitoring mode.
 
 ### Child / Learner
 
@@ -47,29 +48,31 @@ A child is the actual student. They see a role-appropriate UI: home screen with 
 
 ### Main app (Child / Learner)
 
-| Screen ID | Screen name | Route | Auth |
-|-----------|-------------|-------|------|
-| `384:12481` | Home / Beged | `/burro` | AuthGuard + StudentGuard |
-| — | Modules grid | `/burro/modules` | AuthGuard + StudentGuard |
-| — | Module map | `/burro/modules/:moduleId` | AuthGuard + StudentGuard |
-| — | Lesson detail | `/burro/modules/:moduleId/lesson` | AuthGuard + StudentGuard |
-| — | Quiz | `/burro/practice/:moduleId` | AuthGuard + StudentGuard |
-| — | Results / Natijalar | `/burro/results/:attemptId` | AuthGuard + StudentGuard |
-| — | Module completed | `/burro/modules/:moduleId/complete` | AuthGuard + StudentGuard |
-| — | Statistics | `/burro/statistics` | AuthGuard + StudentGuard |
-| `384:12516` | Leaderboard / Reyting | `/burro/leaderboard` | AuthGuard + StudentGuard |
-| `384:12322` | Leaderboard / Reyting (Parent) | `/burro/leaderboard` | AuthGuard + StudentGuard |
+| Screen ID | Screen name | Route | Auth | Status |
+|-----------|-------------|-------|------|--------|
+| `384:12481` | Home / Beged | `/burro` | AuthGuard + StudentGuard | ✅ |
+| — | Modules grid | `/burro/modules` | AuthGuard + StudentGuard | ✅ |
+| — | Module map | `/burro/modules/:moduleId` | AuthGuard + StudentGuard | ✅ |
+| — | Lesson detail | `/burro/modules/:moduleId/lesson` | AuthGuard + StudentGuard | ❌ |
+| — | Quiz | `/burro/practice/:moduleId` | AuthGuard + StudentGuard | ✅ |
+| — | Results / Natijalar | `/burro/results` | AuthGuard | ✅ |
+| — | Module completed | `/burro/modules/:moduleId/complete` | AuthGuard + StudentGuard | ✅ |
+| — | Statistics | `/burro/statistics` | AuthGuard + StudentGuard | ✅ |
+| `384:12516` | Leaderboard / Reyting | `/burro/leaderboard` | AuthGuard + StudentGuard | ✅ |
+| `384:12322` | Leaderboard / Reyting (Parent) | `/burro/leaderboard` | AuthGuard + StudentGuard | ✅ |
 
 ### Parent (Profile & Settings)
 
-| Screen ID | Screen name | Route | Auth |
-|-----------|-------------|-------|------|
-| `384:12633` | Profile / Settings | `/burro/profile` | AuthGuard + StudentGuard |
-| `384:12673` | Language bottom sheet | (on Profile) | AuthGuard + StudentGuard |
-| `384:12740` | Logout modal | (on Profile) | AuthGuard + StudentGuard |
-| `384:12794` | Children list | `/burro/children` | AuthGuard + StudentGuard |
-| `384:12825` | Add / Edit child | `/burro/children/add` | AuthGuard + StudentGuard |
-| `384:12860` | Gender bottom sheet | (on Add/Edit child) | AuthGuard + StudentGuard |
+| Screen ID | Screen name | Route | Auth | Status |
+|-----------|-------------|-------|------|--------|
+| `384:12633` | Profile / Settings | `/burro/profile` | AuthGuard + StudentGuard | ✅ |
+| `384:12673` | Language bottom sheet | (on Profile) | AuthGuard + StudentGuard | ✅ |
+| `384:12740` | Logout modal | (on Profile) | AuthGuard + StudentGuard | ✅ |
+| `384:12794` | Children list | `/burro/children` | AuthGuard + StudentGuard | ✅ |
+| `384:12825` | Add / Edit child | `/burro/children/add` | AuthGuard + StudentGuard | ✅ |
+| `384:12860` | Gender bottom sheet | (on Add/Edit child) | AuthGuard + StudentGuard | ✅ |
+| — | **Parent Dashboard** | `/burro/parent` | AuthGuard + ParentGuard | ✅ |
+| — | **Child monitoring** | `/burro/parent/children/:childId` | AuthGuard + ParentGuard | ✅ |
 
 ## 4. Navigation map
 
@@ -503,7 +506,6 @@ Add child (/burro/children/add)
 | Component | Location | Description |
 |-----------|----------|-------------|
 | `BottomNav` | `src/modules/arabtilibot/ui/BottomNav.tsx` | Fixed bottom nav with 4 tabs: Asosiy, Modules, Reyting, Profil |
-| `MobileStatusBar` | Inline in varios components | Semi-transparent 9:41 time + battery/wifi icons |
 | Page container | Inline | `min-h-screen bg-gradient-to-b from-gray-25 via-white to-gray-200` |
 
 ### Cards
@@ -734,11 +736,15 @@ Add child (/burro/children/add)
 ## 13. Fixed flow gaps
 
 1. **Auto-login vs manual login**: Mini App auto-login via initData may fail silently. The `isInitiatingTelegram` flag prevents infinite spinner state.
-2. **Parent vs Student UI**: Same role for now (`student`), but Parent section UI renders settings/child management. Future: separate role with distinct API responses.
-3. **No child-switching yet**: "Ota-ona rejimiga o'tish" button is visual-only. Future flow: parent selects a child → app reloads with child's context.
+2. **Parent vs Student UI**: Parent role now exists in `UserRole` enum. Separate guards (`ParentGuard`) and routes (`/burro/parent`, `/burro/parent/children/:childId`) are implemented.
+3. **No child-switching yet**: "Ota-ona rejimiga o'tish" button switches the user's role via `POST /parent/switch`. Future: select a child → app reloads with child's context.
 4. **Children API not built**: POST/GET/DELETE /children endpoints need backend implementation. Frontend uses mock data.
-5. **Arabic language option**: Added to language sheet (العربية) but no Arabic translations exist in the codebase yet.
+5. **Arabic language option**: Added to language sheet (العربية) but no Arabic translations exist in the codebase yet. Also `AppLanguage` Prisma enum only has `uz`, `en`, `ru` — missing `ar`.
 6. **Edit child** not implemented: Gender sheet and form support both add and edit, but the edit flow (populate form with existing data) is not wired.
+7. **No child monitoring screen**: Resolved — `/burro/parent/children/:childId` shows child stats, modules, weak letters, recent activity.
+8. **No Parent role in enum**: Resolved — `UserRole` enum now has `Parent = 'parent'`. `ParentGuard` protects parent routes.
+9. **Missing routes from design**: Module map, Results, Module completed implemented (3 of 4). Lesson detail (`/burro/modules/:moduleId/lesson`) still pending — practice starts directly from module map.
+10. **Child cards missing action buttons**: Resolved — "Statistika" and "Boshlash" buttons added per card + empty state icon.
 
 ## 14. Handoff checklist
 
@@ -752,8 +758,12 @@ Add child (/burro/children/add)
 - [x] Gender bottom sheet.
 - [x] Home screen with continue module, daily task, stats.
 - [x] Leaderboard with Top 3 + ranked list.
+- [x] Child monitoring screen — `/burro/parent/children/:childId`.
+- [x] Child card action buttons — "Statistika" and "Boshlash" + empty state.
+- [x] Missing student routes — Module map, Results, Module completed (3 of 4).
+- [x] Greeting uses user's first name from Telegram.
 - [ ] Children API endpoints (backend) — `GET /children`, `POST /children`, `DELETE /children`.
-- [ ] Parent role separation — distinct API responses for parent vs student.
-- [ ] Arabic translations (i18n).
+- [x] Parent role separation — `UserRole.parent` enum value, `ParentGuard`, distinct routes.
+- [ ] Arabic translations (i18n) — `ar` missing in `AppLanguage` Prisma enum.
 - [ ] Edit child flow (form pre-population).
-- [ ] Ota-ona rejimiga o'tish (parent mode toggle).
+- [x] Ota-ona rejimiga o'tish (parent mode toggle via `POST /parent/switch`).

@@ -111,12 +111,11 @@ jobs:
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
             set -e
 
-            # Prepare target dirs
             mkdir -p /var/www/burro/apps/student
             mkdir -p /var/www/burro/apps/parent
             mkdir -p /var/www/burro/apps/admin
+            mkdir -p /var/log/pm2
 
-            # Backup current dist (rollback point)
             ts=$(date +%Y%m%d_%H%M%S)
             [ -d /var/www/burro/apps/student/dist ] && \
               cp -r /var/www/burro/apps/student/dist /var/www/burro/apps/student/dist_backup_$ts
@@ -125,14 +124,78 @@ jobs:
             [ -d /var/www/burro/apps/admin/dist ] && \
               cp -r /var/www/burro/apps/admin/dist /var/www/burro/apps/admin/dist_backup_$ts
 
-            # Extract new release
             cd /var/www/burro
             tar -xzf /tmp/burro-release.tar.gz
 
-            # Cleanup tarball
+            if ! command -v npm >/dev/null 2>&1; then
+              echo "npm is required on the server"
+              exit 1
+            fi
+            if ! command -v pm2 >/dev/null 2>&1; then
+              echo "pm2 is required on the server"
+              exit 1
+            fi
+            if ! command -v serve >/dev/null 2>&1; then
+              npm install -g serve
+            fi
+
+            SERVE_BIN=$(command -v serve)
+
+            {
+              printf '%s\n' "module.exports = {"
+              printf '%s\n' "  apps: ["
+              printf '%s\n' "    {"
+              printf '%s\n' "      name: 'burro-student',"
+              printf '%s\n' "      script: '$SERVE_BIN',"
+              printf '%s\n' "      args: '-s apps/student/dist -l 5173 --no-clipboard',"
+              printf '%s\n' "      cwd: '/var/www/burro',"
+              printf '%s\n' "      interpreter: 'none',"
+              printf '%s\n' "      env: { NODE_ENV: 'production' },"
+              printf '%s\n' "      error_file: '/var/log/pm2/burro-student-error.log',"
+              printf '%s\n' "      out_file: '/var/log/pm2/burro-student-out.log',"
+              printf '%s\n' "      time: true,"
+              printf '%s\n' "      autorestart: true,"
+              printf '%s\n' "      max_restarts: 5,"
+              printf '%s\n' "      restart_delay: 2000"
+              printf '%s\n' "    },"
+              printf '%s\n' "    {"
+              printf '%s\n' "      name: 'burro-parent',"
+              printf '%s\n' "      script: '$SERVE_BIN',"
+              printf '%s\n' "      args: '-s apps/parent/dist -l 5174 --no-clipboard',"
+              printf '%s\n' "      cwd: '/var/www/burro',"
+              printf '%s\n' "      interpreter: 'none',"
+              printf '%s\n' "      env: { NODE_ENV: 'production' },"
+              printf '%s\n' "      error_file: '/var/log/pm2/burro-parent-error.log',"
+              printf '%s\n' "      out_file: '/var/log/pm2/burro-parent-out.log',"
+              printf '%s\n' "      time: true,"
+              printf '%s\n' "      autorestart: true,"
+              printf '%s\n' "      max_restarts: 5,"
+              printf '%s\n' "      restart_delay: 2000"
+              printf '%s\n' "    },"
+              printf '%s\n' "    {"
+              printf '%s\n' "      name: 'burro-admin',"
+              printf '%s\n' "      script: '$SERVE_BIN',"
+              printf '%s\n' "      args: '-s apps/admin/dist -l 5175 --no-clipboard',"
+              printf '%s\n' "      cwd: '/var/www/burro',"
+              printf '%s\n' "      interpreter: 'none',"
+              printf '%s\n' "      env: { NODE_ENV: 'production' },"
+              printf '%s\n' "      error_file: '/var/log/pm2/burro-admin-error.log',"
+              printf '%s\n' "      out_file: '/var/log/pm2/burro-admin-out.log',"
+              printf '%s\n' "      time: true,"
+              printf '%s\n' "      autorestart: true,"
+              printf '%s\n' "      max_restarts: 5,"
+              printf '%s\n' "      restart_delay: 2000"
+              printf '%s\n' "    }"
+              printf '%s\n' "  ]"
+              printf '%s\n' "}"
+            } > /var/www/burro/ecosystem.config.js
+
+            cp /var/www/burro/ecosystem.config.js /var/www/burro/ecosystem.config.js.bak
+            pm2 startOrReload /var/www/burro/ecosystem.config.js --update-env
+            pm2 save
+
             rm /tmp/burro-release.tar.gz
 
-            # Clean old backups (keep last 2)
             for app in student parent admin; do
               ls -dt /var/www/burro/apps/$app/dist_backup_* 2>/dev/null | tail -n +3 | xargs rm -rf
             done
@@ -143,18 +206,20 @@ jobs:
       - name: Health check
         run: |
           ssh "$SSH_USER@$SSH_HOST" << 'EOF'
-            check() {
-              local name=$1
-              local path=$2
-              if [ -f "$path/index.html" ]; then
-                echo "✓ $name dist present"
+            set -e
+            sleep 3
+            check_port() {
+              name=$1
+              port=$2
+              if curl -sf "http://localhost:$port" > /dev/null; then
+                echo "$name OK"
               else
-                echo "✗ $name dist MISSING — rollback needed"
+                echo "$name FAIL"
                 exit 1
               fi
             }
-            check student /var/www/burro/apps/student/dist
-            check parent  /var/www/burro/apps/parent/dist
-            check admin   /var/www/burro/apps/admin/dist
-            echo "All health checks passed"
+            check_port student 5173
+            check_port parent 5174
+            check_port admin 5175
+            pm2 list
           EOF

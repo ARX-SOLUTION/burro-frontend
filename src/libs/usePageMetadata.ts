@@ -19,14 +19,23 @@ export const usePageMetadata = ({ title, description }: PageMetadata) => {
       document.title = title;
     }
 
+    let meta: HTMLMetaElement | null = null;
+    let created = false;
     if (description) {
-      let meta = getDescriptionTag();
+      meta = getDescriptionTag();
       if (!meta) {
         meta = document.createElement('meta');
         meta.name = 'description';
         document.head.appendChild(meta);
+        created = true;
       }
       meta.content = description;
     }
+
+    return () => {
+      if (created && meta) {
+        document.head.removeChild(meta);
+      }
+    };
   }, [title, description]);
 };

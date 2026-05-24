@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { ArrowRight, CheckCircle, ChevronDown } from '@untitledui/icons';
 
 import type { HomeDashboardData } from '@/modules/arabtilibot/types/module';
@@ -23,10 +23,13 @@ type HomeScreenProps = {
 };
 
 const MobileStatusBar = memo(function MobileStatusBar() {
+  const [time] = useState(() =>
+    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
+  );
   return (
     <div className="flex items-center justify-between px-6 pt-3 text-white">
       <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
-        9:41
+        {time}
       </p>
 
       <div className="flex items-center gap-2">
@@ -93,7 +96,7 @@ const ChildCardComponent = memo(function ChildCardComponent({ child }: { child: 
       <div className="mt-3 flex items-center gap-3">
         <button
           type="button"
-          className="rounded-full bg-gradient-to-r from-[#20B7E5] to-[#0D9488] px-5 py-2 text-sm leading-5 font-semibold text-white"
+          className="rounded-full bg-gradient-to-r from-[#20B7E5] to-teal-600 px-5 py-2 text-sm leading-5 font-semibold text-white"
         >
           Boshlash
         </button>

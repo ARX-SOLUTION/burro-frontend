@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { ArrowLeft, Edit03, Plus } from '@untitledui/icons';
 
 import type { ChildCard } from '@/modules/arabtilibot/types/children';
@@ -12,10 +12,13 @@ type ChildrenListProps = {
 };
 
 const MobileStatusBar = memo(function MobileStatusBar() {
+  const [time] = useState(() =>
+    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
+  );
   return (
     <div className="flex items-center justify-between px-6 pt-3 text-white">
       <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
-        9:41
+        {time}
       </p>
       <div className="flex items-center gap-2">
         <div className="flex items-end gap-px">
@@ -133,7 +136,7 @@ export default function ChildrenList({
           <button
             type="button"
             onClick={onAddChild}
-            className="flex w-full items-center justify-center gap-2 rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-[0_4px_0_0_rgb(11,79,164),0_8px_24px_-4px_rgba(18,183,229,0.44)]"
+            className="flex w-full items-center justify-center gap-2 rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-button"
           >
             <Plus className="size-5" />
             Qo&apos;shish

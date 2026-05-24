@@ -16,7 +16,7 @@ const ModuleCard = ({ module, onStart }: ModuleCardProps) => {
       type="button"
       onClick={() => !isLocked && onStart?.(module.id)}
       disabled={isLocked}
-      className={`flex w-full items-center gap-4 rounded-[20px] bg-white p-4 text-left shadow-[0_2px_0_0_rgb(172,173,176),inset_0_0_6px_0_rgba(255,255,255,0.63)] transition-transform active:translate-y-px disabled:cursor-not-allowed ${
+      className={`flex w-full items-center gap-4 rounded-[20px] bg-white p-4 text-left shadow-card transition-transform active:translate-y-px disabled:cursor-not-allowed ${
         isActive ? 'border-l-4 border-l-teal-400' : ''
       }`}
     >
@@ -31,11 +31,7 @@ const ModuleCard = ({ module, onStart }: ModuleCardProps) => {
             <path d="M17 9V7A5 5 0 0 0 7 7v2H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1h-2zm-2 0H9V7a3 3 0 1 1 6 0v2z" />
           </svg>
         ) : (
-          <span
-            className="text-[28px] leading-none font-bold text-white"
-            dir="rtl"
-            style={{ fontFamily: '"Scheherazade New", "Amiri", serif' }}
-          >
+          <span className="font-arabic text-[28px] leading-none font-bold text-white" dir="rtl">
             {module.title.charAt(0)}
           </span>
         )}

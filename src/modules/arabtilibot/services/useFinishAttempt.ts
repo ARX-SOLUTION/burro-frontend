@@ -12,7 +12,6 @@ export const useFinishAttempt = () => {
       queryClient.invalidateQueries({ queryKey: burroQueryKeys.home() });
       queryClient.invalidateQueries({ queryKey: burroQueryKeys.profile() });
       queryClient.invalidateQueries({ queryKey: burroQueryKeys.statistics() });
-      queryClient.invalidateQueries({ queryKey: burroQueryKeys.all });
       queryClient.removeQueries({ queryKey: burroQueryKeys.attempt(attemptId) });
     },
   });

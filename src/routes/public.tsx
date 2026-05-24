@@ -1,7 +1,5 @@
 import { lazy } from 'react';
-import { Navigate, type RouteObject } from 'react-router-dom';
-
-import { ARAB_TILI_ROUTE_PATHS } from '@/modules/arabtilibot/constants/routes';
+import { type RouteObject } from 'react-router-dom';
 
 import { AuthGuard, StudentGuard } from '@/components/guards';
 
@@ -39,26 +37,6 @@ export const publicRoutes: RouteObject[] = [
   {
     index: true,
     element: <HomePage />,
-  },
-  {
-    path: ARAB_TILI_ROUTE_PATHS.WELCOME,
-    element: <Navigate to="/burro/welcome" replace />,
-  },
-  {
-    path: ARAB_TILI_ROUTE_PATHS.LESSONS,
-    element: <Navigate to="/burro" replace />,
-  },
-  {
-    path: ARAB_TILI_ROUTE_PATHS.LESSON,
-    element: <Navigate to="/burro/modules" replace />,
-  },
-  {
-    path: ARAB_TILI_ROUTE_PATHS.LESSON_BY_ID,
-    element: <Navigate to="/burro/modules" replace />,
-  },
-  {
-    path: ARAB_TILI_ROUTE_PATHS.LESSON_PLAY,
-    element: <Navigate to="/burro/modules" replace />,
   },
   {
     path: 'burro/welcome',

@@ -1,6 +1,7 @@
 import axiosInstance, { authAxiosInstance } from '@/services';
 
-import type { AuthSuccessResponse, RefreshTokenRequest, TokensResponse } from '../types';
+import type { AuthSuccessResponse, RefreshTokenRequest } from '../types';
+import type { AuthTokens } from '../types/AuthTokens';
 
 const AUTH_ROUTES = {
   telegram: '/auth/telegram',
@@ -25,7 +26,7 @@ export const authAPI = {
       .then((res) => res.data),
 
   refresh: (payload: RefreshTokenRequest) =>
-    authAxiosInstance.post<TokensResponse>(AUTH_ROUTES.refresh, payload).then((res) => res.data),
+    authAxiosInstance.post<AuthTokens>(AUTH_ROUTES.refresh, payload).then((res) => res.data),
 
   logout: () => axiosInstance.post<void>(AUTH_ROUTES.logout).then((res) => res.data),
 };

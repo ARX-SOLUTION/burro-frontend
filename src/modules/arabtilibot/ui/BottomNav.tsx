@@ -1,9 +1,10 @@
+import { memo } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BarChart01, BookOpen01, Home03, User01 } from '@untitledui/icons';
 
 import PlayButton from './PlayButton';
 
-export default function BottomNav() {
+const BottomNav = memo(function BottomNav() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -77,4 +78,6 @@ export default function BottomNav() {
       </div>
     </div>
   );
-}
+});
+
+export default BottomNav;

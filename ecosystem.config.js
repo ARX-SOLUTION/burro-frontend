@@ -1,0 +1,52 @@
+module.exports = {
+  apps: [
+    {
+      name: 'burro-student',
+      script: 'serve',
+      args: '-s apps/student/dist -l 5173 --no-clipboard',
+      cwd: '/var/www/burro',
+      interpreter: 'none',
+      env: {
+        NODE_ENV: 'production',
+      },
+      error_file: '/var/log/pm2/burro-student-error.log',
+      out_file: '/var/log/pm2/burro-student-out.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 5,
+      restart_delay: 2000,
+    },
+    {
+      name: 'burro-parent',
+      script: 'serve',
+      args: '-s apps/parent/dist -l 5174 --no-clipboard',
+      cwd: '/var/www/burro',
+      interpreter: 'none',
+      env: {
+        NODE_ENV: 'production',
+      },
+      error_file: '/var/log/pm2/burro-parent-error.log',
+      out_file: '/var/log/pm2/burro-parent-out.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 5,
+      restart_delay: 2000,
+    },
+    {
+      name: 'burro-admin',
+      script: 'serve',
+      args: '-s apps/admin/dist -l 5175 --no-clipboard',
+      cwd: '/var/www/burro',
+      interpreter: 'none',
+      env: {
+        NODE_ENV: 'production',
+      },
+      error_file: '/var/log/pm2/burro-admin-error.log',
+      out_file: '/var/log/pm2/burro-admin-out.log',
+      time: true,
+      autorestart: true,
+      max_restarts: 5,
+      restart_delay: 2000,
+    },
+  ],
+}

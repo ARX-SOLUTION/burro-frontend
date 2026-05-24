@@ -40,6 +40,15 @@ jobs:
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
 
+      - name: Setup SSH key
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
       - name: Test SSH connectivity
         uses: nick-invision/retry@v3
         with:
@@ -47,11 +56,10 @@ jobs:
           max_attempts: ${{ env.SSH_RETRIES }}
           retry_wait_seconds: ${{ env.SSH_RETRY_DELAY }}
           command: |
-            ssh -o StrictHostKeyChecking=no \
-                -o ConnectTimeout=10 \
+            ssh -o ConnectTimeout=10 \
                 -o ServerAliveInterval=5 \
                 -o ServerAliveCountMax=3 \
-                -i <(echo "${{ secrets.SERVER_SSH_KEY }}") \
+                -i ~/.ssh/deploy_key \
                 -p 22 \
                 root@${{ secrets.SERVER_HOST }} \
                 "echo 'SSH connection successful'"

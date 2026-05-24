@@ -1,10 +1,29 @@
 import { z } from 'zod';
 
+const normalizeApiBaseUrl = (url: string): string => {
+  const trimmedUrl = url.replace(/\/+$/, '');
+
+  try {
+    const parsedUrl = new URL(trimmedUrl);
+    const normalizedPath = parsedUrl.pathname.replace(/\/+$/, '');
+
+    if (!normalizedPath || normalizedPath === '/') {
+      parsedUrl.pathname = '/api';
+      return parsedUrl.toString().replace(/\/+$/, '');
+    }
+
+    return trimmedUrl;
+  } catch {
+    return trimmedUrl;
+  }
+};
+
 const envSchema = z.object({
   VITE_API_BASE_URL: z
     .string({ error: 'VITE_API_BASE_URL is required' })
     .url('VITE_API_BASE_URL must be a valid URL')
-    .default('http://localhost:4000/api'),
+    .default('http://localhost:4000/api')
+    .transform(normalizeApiBaseUrl),
   MODE: z.enum(['development', 'production', 'test']).default('development'),
   DEV: z.boolean().default(true),
   PROD: z.boolean().default(false),

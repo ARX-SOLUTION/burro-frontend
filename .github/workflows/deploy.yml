@@ -39,17 +39,17 @@ jobs:
       - name: Build student
         run: pnpm build:student
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz' }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz/api' }}
 
       - name: Build parent
         run: pnpm build:parent
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz' }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz/api' }}
 
       - name: Build admin
         run: pnpm build:admin
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz' }}
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL || 'https://api.burroarab.uz/api' }}
 
       - name: Verify dist outputs
         run: |

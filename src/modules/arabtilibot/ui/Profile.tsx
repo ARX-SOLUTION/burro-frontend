@@ -8,6 +8,7 @@ type ProfileProps = {
   isLoading?: boolean;
   isSaving?: boolean;
   errorMessage?: string | null;
+  childrenCount?: number;
   onRetry?: () => void;
   onSave?: (data: UpdateStudentProfileRequest) => void;
   onLogout?: () => void;
@@ -49,6 +50,7 @@ export default function Profile({
   profile,
   isLoading = false,
   errorMessage,
+  childrenCount,
   onRetry,
   onSave,
   onLogout,
@@ -128,7 +130,9 @@ export default function Profile({
 
         <div className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4">
           <span className="text-sm text-gray-700">Farzandlar</span>
-          <span className="text-sm font-semibold text-gray-900">2 ta</span>
+          <span className="text-sm font-semibold text-gray-900">
+            {childrenCount != null ? `${childrenCount} ta` : '2 ta'}
+          </span>
         </div>
 
         <div

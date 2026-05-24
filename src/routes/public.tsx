@@ -38,6 +38,15 @@ const ParentDashboardPage = lazy(() =>
 const ParentChildDetailPage = lazy(() =>
   import('@/pages/ParentChildDetailPage').then((m) => ({ default: m.ParentChildDetailPage })),
 );
+const ModuleMapPage = lazy(() =>
+  import('@/pages/ModuleMapPage').then((m) => ({ default: m.ModuleMapPage })),
+);
+const ResultsPage = lazy(() =>
+  import('@/pages/ResultsPage').then((m) => ({ default: m.ResultsPage })),
+);
+const ModuleCompletedPage = lazy(() =>
+  import('@/pages/ModuleCompletedPage').then((m) => ({ default: m.ModuleCompletedPage })),
+);
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -145,6 +154,34 @@ export const publicRoutes: RouteObject[] = [
         <ParentGuard>
           <ParentChildDetailPage />
         </ParentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/modules/:moduleId',
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <ModuleMapPage />
+        </StudentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/results',
+    element: (
+      <AuthGuard>
+        <ResultsPage />
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/modules/:moduleId/complete',
+    element: (
+      <AuthGuard>
+        <StudentGuard>
+          <ModuleCompletedPage />
+        </StudentGuard>
       </AuthGuard>
     ),
   },

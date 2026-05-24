@@ -5,6 +5,7 @@ import type {
   FinishAttemptResponse,
   LeaderboardPeriod,
   LeaderboardResponse,
+  ModuleDetailResponse,
   ModuleFilter,
   ModulesResponse,
   StartAttemptResponse,
@@ -50,6 +51,11 @@ export const burroAPI = {
 
   getModules: async (filter: ModuleFilter = 'all'): Promise<ModulesResponse> => {
     const response = await axiosInstance.get('/modules', { params: { filter } });
+    return response.data;
+  },
+
+  getModuleDetail: async (moduleId: string): Promise<ModuleDetailResponse> => {
+    const response = await axiosInstance.get(`/modules/${moduleId}`);
     return response.data;
   },
 

@@ -1,17 +1,17 @@
 import { memo } from 'react';
-import { ArrowLeft, Edit03, Plus } from '@untitledui/icons';
+import { ArrowLeft, Edit03, Plus, Users02 } from '@untitledui/icons';
 
-import type { ChildCard } from '@/modules/arabtilibot/types/children';
+import type { ChildCard, ChildrenListProps } from '@/modules/arabtilibot/types/children';
 
-type ChildrenListProps = {
-  childrenData: ChildCard[];
-  isLoading?: boolean;
-  onBack?: () => void;
-  onEdit?: () => void;
-  onAddChild?: () => void;
-};
-
-const ChildCardComponent = memo(function ChildCardComponent({ child }: { child: ChildCard }) {
+const ChildCardComponent = memo(function ChildCardComponent({
+  child,
+  onStart,
+  onStats,
+}: {
+  child: ChildCard;
+  onStart?: (id: string) => void;
+  onStats?: (id: string) => void;
+}) {
   return (
     <div className="rounded-[28px] bg-white p-4 shadow-xl">
       <div className="flex items-center gap-4">
@@ -25,6 +25,26 @@ const ChildCardComponent = memo(function ChildCardComponent({ child }: { child: 
             <span>{child.className}</span>
           </div>
         </div>
+      </div>
+      <div className="mt-3 flex items-center gap-3">
+        {onStart && (
+          <button
+            type="button"
+            onClick={() => onStart(child.id)}
+            className="rounded-full bg-gradient-to-r from-blue-600 to-teal-400 px-5 py-2 text-sm leading-5 font-semibold text-white"
+          >
+            Boshlash
+          </button>
+        )}
+        {onStats && (
+          <button
+            type="button"
+            onClick={() => onStats(child.id)}
+            className="text-sm leading-5 font-semibold text-teal-600"
+          >
+            Statistika
+          </button>
+        )}
       </div>
     </div>
   );
@@ -56,6 +76,8 @@ export default function ChildrenList({
   onBack,
   onEdit,
   onAddChild,
+  onStartChild,
+  onViewChildStats,
 }: ChildrenListProps) {
   if (isLoading) {
     return (
@@ -96,9 +118,24 @@ export default function ChildrenList({
         </div>
 
         <div className="flex-1 space-y-3 px-4">
-          {childrenData.map((child) => (
-            <ChildCardComponent key={child.id} child={child} />
-          ))}
+          {childrenData.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-white/50">
+              <Users02 className="mb-4 size-16 text-white/30" />
+              <p className="text-sm leading-5 font-medium">Hozircha farzand yo‘q</p>
+              <p className="mt-1 text-xs leading-4 text-white/30">
+                Qo‘shish tugmasini bosing va farzandingizni qo‘shing
+              </p>
+            </div>
+          ) : (
+            childrenData.map((child) => (
+              <ChildCardComponent
+                key={child.id}
+                child={child}
+                onStart={onStartChild}
+                onStats={onViewChildStats}
+              />
+            ))
+          )}
         </div>
 
         <div className="px-4 py-6">

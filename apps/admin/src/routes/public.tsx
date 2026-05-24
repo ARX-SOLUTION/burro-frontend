@@ -7,7 +7,6 @@ import { AuthGuard, RoleGuard } from '@burro/shared/components/guards';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { SettingsLayout } from '@/layouts/SettingsLayout';
 
-const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
@@ -22,7 +21,7 @@ const ProfileSettingsPage = lazy(() =>
 export const publicRoutes: RouteObject[] = [
   {
     index: true,
-    element: <HomePage />,
+    element: <Navigate to="/dashboard" replace />,
   },
   {
     path: 'dashboard',

@@ -1,9 +1,8 @@
 import { lazy } from 'react';
-import { type RouteObject } from 'react-router-dom';
+import { Navigate, type RouteObject } from 'react-router-dom';
 
 import { AuthGuard, ParentGuard } from '@burro/shared/components/guards';
 
-const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
@@ -29,7 +28,7 @@ const ResultsPage = lazy(() =>
 export const publicRoutes: RouteObject[] = [
   {
     index: true,
-    element: <HomePage />,
+    element: <Navigate to="/burro/parent" replace />,
   },
   {
     path: 'burro/profile',

@@ -8,15 +8,27 @@ import { HomeScreen } from '@/modules/arabtilibot/ui/screens/HomeScreen';
 import { getErrorMessage } from '@/modules/common';
 
 import { LoadingIndicator } from '@/components/application/loading-indicator/loading-indicator';
+import { useAuth } from '@/hooks/use-auth';
 import { usePageMetadata } from '@/libs/usePageMetadata';
 
 export const BurroHomePage = () => {
   usePageMetadata({ title: 'Burro' });
 
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = useStudentHome();
 
-  const dashboardData = useMemo(() => (data ? mapStudentHomeToDashboardData(data) : null), [data]);
+  const dashboardData = useMemo(() => {
+    if (!data) return null;
+
+    const mapped = mapStudentHomeToDashboardData(data);
+    const firstName = user?.fullName?.split(' ')[0] ?? '';
+
+    return {
+      ...mapped,
+      greeting: firstName ? `${firstName}, bugungi darsga tayyormisiz?` : mapped.greeting,
+    };
+  }, [data, user?.fullName]);
 
   const handleOpenModulesList = useCallback(() => navigate('/burro/modules'), [navigate]);
 

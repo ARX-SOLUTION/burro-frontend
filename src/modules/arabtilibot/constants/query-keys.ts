@@ -8,6 +8,7 @@ export const burroQueryKeys = {
   statisticsChart: (period: StatisticsChartPeriod) =>
     [...burroQueryKeys.all, 'statisticsChart', period] as const,
   modules: (filter: ModuleFilter = 'all') => [...burroQueryKeys.all, 'modules', filter] as const,
+  moduleDetail: (moduleId: string) => [...burroQueryKeys.all, 'moduleDetail', moduleId] as const,
   attempt: (attemptId: string) => [...burroQueryKeys.all, 'attempt', attemptId] as const,
   leaderboard: (period: LeaderboardPeriod) =>
     [...burroQueryKeys.all, 'leaderboard', period] as const,

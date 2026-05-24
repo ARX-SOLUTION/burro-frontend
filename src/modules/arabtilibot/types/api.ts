@@ -86,6 +86,27 @@ export type StudentStatisticsResponse = {
 export type ModuleFilter = 'all' | 'open' | 'completed';
 export type ModuleStatus = 'locked' | 'open' | 'in_progress' | 'completed';
 
+export type ModuleDetailResponse = {
+  id: string;
+  title: string;
+  icon_letter: string;
+  icon_color: string;
+  order_index: number;
+  xp_reward: number;
+  estimated_min: number;
+  total_questions: number;
+  is_free: boolean;
+  status: ModuleStatus;
+  description: string | null;
+  attempts_count: number;
+  best_attempt: {
+    accuracy_pct: number | null;
+    wrong_count: number;
+    time_spent_sec: number | null;
+    xp_earned: number;
+  } | null;
+};
+
 export type ModulesResponse = {
   modules: Array<{
     id: string;

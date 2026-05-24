@@ -1,13 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import {
-  mapAttemptQuestionsToView,
-  mapFinishAttemptSummary,
-} from '@/modules/arabtilibot/libs/mappers';
+import { mapAttemptQuestionsToView } from '@/modules/arabtilibot/libs/mappers';
 import { useAttemptQuestions } from '@/modules/arabtilibot/services/useAttemptQuestions';
 import { useFinishAttempt } from '@/modules/arabtilibot/services/useFinishAttempt';
-import { useRestartAttempt } from '@/modules/arabtilibot/services/useRestartAttempt';
 import { useStartAttempt } from '@/modules/arabtilibot/services/useStartAttempt';
 import { useSubmitAnswer } from '@/modules/arabtilibot/services/useSubmitAnswer';
 import type { LessonPlayQuestion } from '@/modules/arabtilibot/types/question';
@@ -33,10 +29,6 @@ export default function PracticePlayer() {
     allAnswered: boolean;
     livesRemaining: number;
   } | null>(null);
-  const [finishSummary, setFinishSummary] = useState<ReturnType<
-    typeof mapFinishAttemptSummary
-  > | null>(null);
-
   const {
     mutateAsync: startAttempt,
     isPending: isStarting,
@@ -61,7 +53,6 @@ export default function PracticePlayer() {
     error: finishError,
     reset: resetFinishAttempt,
   } = useFinishAttempt();
-  const { mutateAsync: restartAttempt, isPending: isRestarting } = useRestartAttempt();
 
   const questions = useMemo(
     () => (questionsResponse ? mapAttemptQuestionsToView(questionsResponse) : []),
@@ -133,14 +124,6 @@ export default function PracticePlayer() {
     resetFinishAttempt();
   }, [index, resetFinishAttempt, resetSubmitAnswer]);
 
-  const resetAttemptState = useCallback(() => {
-    setFinishSummary(null);
-    setSelected(null);
-    setFeedback(null);
-    setAnsweredQuestionIds([]);
-    setIndex(0);
-  }, []);
-
   const handleRetry = useCallback(() => {
     if (!moduleId) return;
     void startAttempt(moduleId)
@@ -158,14 +141,6 @@ export default function PracticePlayer() {
     },
     [feedback],
   );
-
-  const handleRestartAttempt = useCallback(() => {
-    if (!moduleId) return;
-    void restartAttempt(moduleId).then((response) => {
-      resetAttemptState();
-      setAttemptId(response.attempt_id);
-    });
-  }, [moduleId, restartAttempt, resetAttemptState]);
 
   const handleCheck = useCallback(async () => {
     if (!selected || !attemptId || !currentQuestion) return;
@@ -215,7 +190,7 @@ export default function PracticePlayer() {
     if (feedback.allAnswered && attemptId) {
       try {
         const result = await finishAttempt(attemptId);
-        setFinishSummary(mapFinishAttemptSummary(result));
+        navigate('/burro/results', { state: result });
       } catch {
         return;
       }
@@ -248,70 +223,6 @@ export default function PracticePlayer() {
       <div className="p-4">
         <div className="rounded-lg bg-white p-4 text-sm text-gray-500 shadow-sm">
           Modul aniqlanmadi.
-        </div>
-      </div>
-    );
-  }
-
-  if (finishSummary) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 pb-8">
-        <div className="w-full max-w-md">
-          <ResultBanner
-            title={finishSummary.title}
-            descriptionPrefix="Aniqlik:"
-            descriptionValue={`${finishSummary.accuracyPct}%`}
-          />
-          <div className="mt-4 grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">XP</div>
-              <div className="mt-1 text-lg font-semibold text-warning-600">
-                +{finishSummary.xpEarned}
-              </div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">Aniqlik</div>
-              <div className="mt-1 text-lg font-semibold">{finishSummary.accuracyPct}%</div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">Correct</div>
-              <div className="mt-1 text-lg font-semibold text-success-600">
-                {finishSummary.correctCount}
-              </div>
-            </div>
-            <div className="rounded-xl bg-gray-50 p-4">
-              <div className="text-xs text-gray-500">Xato</div>
-              <div className="mt-1 text-lg font-semibold text-error-500">
-                {finishSummary.wrongCount}
-              </div>
-            </div>
-          </div>
-          <div className="mt-6 space-y-3">
-            <button
-              type="button"
-              onClick={() => navigate('/burro')}
-              className="w-full rounded-[28px] bg-teal-600 py-4 font-bold text-white"
-            >
-              Bosh sahifaga qaytish
-            </button>
-            {moduleId && (
-              <button
-                type="button"
-                disabled={isRestarting}
-                onClick={handleRestartAttempt}
-                className="w-full rounded-[28px] bg-gray-100 py-4 font-bold text-gray-700 disabled:opacity-60"
-              >
-                {isRestarting ? 'Qayta boshlanmoqda…' : 'Yana bir bor oʼynash'}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => navigate('/burro/modules')}
-              className="w-full rounded-[28px] border border-gray-200 py-4 font-bold text-gray-500"
-            >
-              Boshqa modulni tanlash
-            </button>
-          </div>
         </div>
       </div>
     );

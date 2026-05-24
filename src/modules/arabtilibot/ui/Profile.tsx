@@ -8,10 +8,10 @@ type ProfileProps = {
   isLoading?: boolean;
   isSaving?: boolean;
   errorMessage?: string | null;
-  childrenCount?: number;
   onRetry?: () => void;
   onSave?: (data: UpdateStudentProfileRequest) => void;
   onLogout?: () => void;
+  onParentSwitch?: () => void;
 };
 
 const LANGUAGE_OPTIONS: Array<{ id: StudentLanguage; label: string }> = [
@@ -50,10 +50,10 @@ export default function Profile({
   profile,
   isLoading = false,
   errorMessage,
-  childrenCount,
   onRetry,
   onSave,
   onLogout,
+  onParentSwitch,
 }: ProfileProps) {
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -128,13 +128,6 @@ export default function Profile({
           <span className="text-sm font-semibold text-teal-600">Batafsil</span>
         </div>
 
-        <div className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4">
-          <span className="text-sm text-gray-700">Farzandlar</span>
-          <span className="text-sm font-semibold text-gray-900">
-            {childrenCount != null ? `${childrenCount} ta` : '2 ta'}
-          </span>
-        </div>
-
         <div
           className="flex h-14 cursor-pointer items-center justify-between border-b border-gray-100 px-4"
           onClick={() => setShowLanguageSheet(true)}
@@ -172,6 +165,7 @@ export default function Profile({
 
       <button
         type="button"
+        onClick={onParentSwitch}
         className="mt-6 w-full rounded-[28px] bg-gradient-to-r from-blue-600 to-teal-400 py-4 text-base font-bold text-white shadow-button"
       >
         Ota-ona rejimiga o&apos;tish

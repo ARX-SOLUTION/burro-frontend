@@ -14,6 +14,13 @@ import { useUsers } from '../services';
 import type { User } from '../types';
 import { UsersFilters } from './UsersFilters';
 
+const LANGUAGE_LABELS: Record<string, string> = {
+  uz: "O'zbek",
+  en: 'English',
+  ru: 'Русский',
+  ar: 'العربية',
+};
+
 interface UsersTableProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
@@ -40,7 +47,26 @@ export const UsersTable = ({ onEdit, onDelete }: UsersTableProps) => {
         id: 'user',
         header: 'User',
         isRowHeader: true,
-        cell: (user) => <AvatarLabelGroup size="md" title={user.fullName} subtitle={user.email} />,
+        cell: (user) => (
+          <AvatarLabelGroup
+            size="md"
+            title={user.fullName}
+            subtitle={user.phone ? `${user.email ?? ''} • ${user.phone}` : (user.email ?? '')}
+          />
+        ),
+      },
+      {
+        id: 'telegram',
+        header: 'Telegram',
+        cell: (user) => (
+          <div className="flex flex-col text-sm">
+            {user.telegramId && <span className="text-gray-500">ID: {user.telegramId}</span>}
+            {user.telegramUsername && (
+              <span className="text-gray-700">@{user.telegramUsername}</span>
+            )}
+            {!user.telegramId && !user.telegramUsername && <span className="text-gray-400">—</span>}
+          </div>
+        ),
       },
       {
         id: 'role',
@@ -52,18 +78,48 @@ export const UsersTable = ({ onEdit, onDelete }: UsersTableProps) => {
         ),
       },
       {
+        id: 'language',
+        header: 'Language',
+        cell: (user) => (
+          <span className="text-sm text-gray-700">
+            {LANGUAGE_LABELS[user.language] ?? user.language}
+          </span>
+        ),
+      },
+      {
         id: 'status',
         header: 'Status',
         cell: (user) => (
-          <Badge color={user.emailVerified ? 'success' : 'warning'} size="sm">
-            {user.emailVerified ? 'Verified' : 'Pending'}
-          </Badge>
+          <div className="flex flex-col gap-1">
+            <Badge color={user.emailVerified ? 'success' : 'warning'} size="sm">
+              {user.emailVerified ? 'Verified' : 'Pending'}
+            </Badge>
+            <Badge color={user.isActive ? 'success' : 'error'} size="sm">
+              {user.isActive ? 'Active' : 'Inactive'}
+            </Badge>
+          </div>
         ),
+      },
+      {
+        id: 'lastLoginAt',
+        header: 'Last Login',
+        cell: (user) =>
+          user.lastLoginAt ? (
+            <span className="text-sm text-gray-700">
+              {format(new Date(user.lastLoginAt), 'MMM d, yyyy')}
+            </span>
+          ) : (
+            <span className="text-sm text-gray-400">—</span>
+          ),
       },
       {
         id: 'createdAt',
         header: 'Created',
-        cell: (user) => format(new Date(user.createdAt), 'MMM d, yyyy'),
+        cell: (user) => (
+          <span className="text-sm text-gray-700">
+            {format(new Date(user.createdAt), 'MMM d, yyyy')}
+          </span>
+        ),
       },
       {
         id: 'actions',

@@ -121,9 +121,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/children',
     element: (
       <AuthGuard>
-        <StudentGuard>
-          <BurroChildrenPage />
-        </StudentGuard>
+        <BurroChildrenPage />
       </AuthGuard>
     ),
   },
@@ -131,9 +129,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/children/add',
     element: (
       <AuthGuard>
-        <StudentGuard>
-          <BurroAddChildPage />
-        </StudentGuard>
+        <BurroAddChildPage />
       </AuthGuard>
     ),
   },

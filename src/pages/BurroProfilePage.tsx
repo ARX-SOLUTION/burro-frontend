@@ -6,9 +6,9 @@ import { useStudentStatistics } from '@/modules/arabtilibot/services/useStudentS
 import { useUpdateStudentProfile } from '@/modules/arabtilibot/services/useUpdateStudentProfile';
 import BottomNav from '@/modules/arabtilibot/ui/BottomNav';
 import Profile from '@/modules/arabtilibot/ui/Profile';
-import { useParentSwitch } from '@/modules/parent';
 import { useLogoutMutation } from '@/modules/auth/services/useLogoutMutation';
 import { getErrorMessage } from '@/modules/common';
+import { useParentSwitch } from '@/modules/parent';
 
 import { usePageMetadata } from '@/libs/usePageMetadata';
 

@@ -22,6 +22,7 @@ type FormData = z.infer<typeof schema>;
 
 const ROLE_OPTIONS = [
   { id: Role.Admin, label: 'Admin' },
+  { id: Role.Parent, label: 'Parent' },
   { id: Role.Student, label: 'Student' },
 ];
 

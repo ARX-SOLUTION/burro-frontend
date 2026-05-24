@@ -19,6 +19,7 @@ interface UsersFiltersProps {
 const ROLE_OPTIONS = [
   { id: '', label: 'All Roles' },
   { id: Role.Admin, label: ROLE_LABELS[Role.Admin] },
+  { id: Role.Parent, label: ROLE_LABELS[Role.Parent] },
   { id: Role.Student, label: ROLE_LABELS[Role.Student] },
 ];
 

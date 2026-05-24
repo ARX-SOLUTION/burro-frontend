@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import { type RouteObject } from 'react-router-dom';
 
-import { AuthGuard, StudentGuard } from '@/components/guards';
+import { AuthGuard, ParentGuard, StudentGuard } from '@/components/guards';
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })));
 const NotFoundPage = lazy(() =>
@@ -31,6 +31,12 @@ const BurroChildrenPage = lazy(() =>
 );
 const BurroAddChildPage = lazy(() =>
   import('@/pages/BurroAddChildPage').then((m) => ({ default: m.BurroAddChildPage })),
+);
+const ParentDashboardPage = lazy(() =>
+  import('@/pages/ParentDashboardPage').then((m) => ({ default: m.ParentDashboardPage })),
+);
+const ParentChildDetailPage = lazy(() =>
+  import('@/pages/ParentChildDetailPage').then((m) => ({ default: m.ParentChildDetailPage })),
 );
 
 export const publicRoutes: RouteObject[] = [
@@ -119,6 +125,26 @@ export const publicRoutes: RouteObject[] = [
         <StudentGuard>
           <BurroAddChildPage />
         </StudentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/parent',
+    element: (
+      <AuthGuard>
+        <ParentGuard>
+          <ParentDashboardPage />
+        </ParentGuard>
+      </AuthGuard>
+    ),
+  },
+  {
+    path: 'burro/parent/children/:childId',
+    element: (
+      <AuthGuard>
+        <ParentGuard>
+          <ParentChildDetailPage />
+        </ParentGuard>
       </AuthGuard>
     ),
   },

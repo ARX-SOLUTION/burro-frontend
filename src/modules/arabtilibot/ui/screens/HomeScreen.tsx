@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { ArrowRight, CheckCircle, ChevronDown } from '@untitledui/icons';
 
 import type { HomeDashboardData } from '@/modules/arabtilibot/types/module';
@@ -21,35 +21,6 @@ type HomeScreenProps = {
   onOpenModulesList: () => void;
   onStartLesson: (lessonId: string) => void;
 };
-
-const MobileStatusBar = memo(function MobileStatusBar() {
-  const [time] = useState(() =>
-    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
-  );
-  return (
-    <div className="flex items-center justify-between px-6 pt-3 text-white">
-      <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
-        {time}
-      </p>
-
-      <div className="flex items-center gap-2">
-        <div className="flex items-end gap-px">
-          <span className="h-1.5 w-0.5 rounded-full bg-white/80" />
-          <span className="h-2 w-0.5 rounded-full bg-white/80" />
-          <span className="h-2.5 w-0.5 rounded-full bg-white/80" />
-          <span className="h-3 w-0.5 rounded-full bg-white" />
-        </div>
-        <div className="relative size-3 rounded-full border border-white/70">
-          <span className="absolute inset-[3px] rounded-full bg-white/80" />
-        </div>
-        <div className="flex h-3.5 w-6 items-center rounded-full border border-white/70 p-0.5">
-          <span className="h-full w-4 rounded-full bg-white" />
-        </div>
-      </div>
-    </div>
-  );
-});
-MobileStatusBar.displayName = 'MobileStatusBar';
 
 const ProfileAvatar = memo(function ProfileAvatar() {
   return (
@@ -120,8 +91,6 @@ export const HomeScreen = memo(function HomeScreen({
     <div className="min-h-screen bg-gradient-to-b from-gray-blue-900 via-gray-blue-950 to-gray-blue-950 px-2 py-0">
       <div className="mx-auto min-h-screen w-full max-w-[402px]">
         <header className="h-[118px]">
-          <MobileStatusBar />
-
           <div className="mx-2 mt-2 flex h-[72px] items-center justify-between overflow-hidden rounded-full border border-white/20 bg-gradient-to-b from-gray-25 via-white to-gray-200 px-2 pr-4 shadow-lg">
             <div className="flex items-center gap-3">
               <ProfileAvatar />

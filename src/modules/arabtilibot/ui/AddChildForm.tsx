@@ -167,26 +167,6 @@ export default function AddChildForm({ onBack, onSave, isSaving = false }: AddCh
 
   return (
     <div className="flex min-h-dvh flex-col bg-gray-50">
-      <div className="flex items-center justify-between px-6 pt-3 text-gray-900">
-        <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
-          9:41
-        </p>
-        <div className="flex items-center gap-2">
-          <div className="flex items-end gap-px">
-            <span className="h-1.5 w-0.5 rounded-full bg-gray-900/80" />
-            <span className="h-2 w-0.5 rounded-full bg-gray-900/80" />
-            <span className="h-2.5 w-0.5 rounded-full bg-gray-900/80" />
-            <span className="h-3 w-0.5 rounded-full bg-gray-900" />
-          </div>
-          <div className="relative size-3 rounded-full border border-gray-900/70">
-            <span className="absolute inset-[3px] rounded-full bg-gray-900/80" />
-          </div>
-          <div className="flex h-3.5 w-6 items-center rounded-full border border-gray-900/70 p-0.5">
-            <span className="h-full w-4 rounded-full bg-gray-900" />
-          </div>
-        </div>
-      </div>
-
       <div className="flex items-center gap-3 px-4 pt-2 pb-4">
         <button type="button" onClick={onBack} className="text-gray-900" aria-label="Orqaga">
           <BackArrowIcon />

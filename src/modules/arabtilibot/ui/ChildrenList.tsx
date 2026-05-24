@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { ArrowLeft, Edit03, Plus } from '@untitledui/icons';
 
 import type { ChildCard } from '@/modules/arabtilibot/types/children';
@@ -10,34 +10,6 @@ type ChildrenListProps = {
   onEdit?: () => void;
   onAddChild?: () => void;
 };
-
-const MobileStatusBar = memo(function MobileStatusBar() {
-  const [time] = useState(() =>
-    new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
-  );
-  return (
-    <div className="flex items-center justify-between px-6 pt-3 text-white">
-      <p className="rounded-full px-2 text-[15px] leading-5 font-semibold tracking-[-0.5px]">
-        {time}
-      </p>
-      <div className="flex items-center gap-2">
-        <div className="flex items-end gap-px">
-          <span className="h-1.5 w-0.5 rounded-full bg-white/80" />
-          <span className="h-2 w-0.5 rounded-full bg-white/80" />
-          <span className="h-2.5 w-0.5 rounded-full bg-white/80" />
-          <span className="h-3 w-0.5 rounded-full bg-white" />
-        </div>
-        <div className="relative size-3 rounded-full border border-white/70">
-          <span className="absolute inset-[3px] rounded-full bg-white/80" />
-        </div>
-        <div className="flex h-3.5 w-6 items-center rounded-full border border-white/70 p-0.5">
-          <span className="h-full w-4 rounded-full bg-white" />
-        </div>
-      </div>
-    </div>
-  );
-});
-MobileStatusBar.displayName = 'MobileStatusBar';
 
 const ChildCardComponent = memo(function ChildCardComponent({ child }: { child: ChildCard }) {
   return (
@@ -89,7 +61,6 @@ export default function ChildrenList({
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-blue-900 via-gray-blue-950 to-gray-blue-950">
         <div className="mx-auto min-h-screen w-full max-w-[402px]">
-          <MobileStatusBar />
           <div className="px-4 pt-4">
             <div className="h-6 w-32 animate-pulse rounded-full bg-white/20" />
           </div>
@@ -104,8 +75,6 @@ export default function ChildrenList({
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-blue-900 via-gray-blue-950 to-gray-blue-950">
       <div className="mx-auto flex min-h-screen w-full max-w-[402px] flex-col">
-        <MobileStatusBar />
-
         <div className="flex items-center justify-between px-4 pt-2 pb-4">
           <button
             type="button"

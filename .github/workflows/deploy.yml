@@ -219,8 +219,9 @@ jobs:
             mkdir -p /var/log/caddy
             cp "$CADDYFILE" "$CADDYFILE.burro-frontend.$ts.bak"
             awk '
-              function is_target(line) {
-                return line ~ /^[[:space:]]*(student|parent|admin|api)\.burroarab\.uz[[:space:]]*\{[[:space:]]*$/
+              function is_target(line, d) {
+                d = "(student|parent|admin|api)\\.burroarab\\.uz"
+                return line ~ "^[[:space:]]*" d "([[:space:]]*\\{|[[:space:]]*,|[[:space:]]*)$"
               }
               function brace_delta(line, tmp, opens, closes) {
                 tmp = line
@@ -237,23 +238,24 @@ jobs:
                 managed = 0
                 next
               }
-              managed {
-                next
-              }
+              managed { next }
               !skip && is_target($0) {
                 skip = 1
                 depth = brace_delta($0)
-                if (depth <= 0) skip = 0
+                if (depth <= 0) in_short = 1
                 next
+              }
+              in_short {
+                if ($0 ~ /^[[:space:]]*$/) in_short = 0
+                else if ($0 ~ /^[[:space:]]*[a-zA-Z0-9.-]+\.[a-zA-Z]+[[:space:]]*(\{|$)/) in_short = 0
+                else next
               }
               skip {
                 depth += brace_delta($0)
                 if (depth <= 0) skip = 0
                 next
               }
-              {
-                print
-              }
+              { print }
             ' "$CADDYFILE" > "$CADDYFILE.tmp"
 
             cat >> "$CADDYFILE.tmp" <<'CADDY'

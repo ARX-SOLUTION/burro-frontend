@@ -11,7 +11,8 @@ export const ParentDashboardPage = () => {
   usePageMetadata({ title: 'Ota-ona paneli' });
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: children, isLoading } = useParentChildren();
+  const isParent = user?.role === Role.Parent;
+  const { data: children = [], isLoading } = useParentChildren(isParent);
   const switchMutation = useParentSwitch();
   const linkMutation = useParentLink();
   const [linkInput, setLinkInput] = useState('');
@@ -35,7 +36,7 @@ export const ParentDashboardPage = () => {
     [navigate],
   );
 
-  if (isLoading) {
+  if (isParent && isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="size-8 animate-spin rounded-full border-4 border-teal-500 border-t-transparent" />
@@ -52,7 +53,7 @@ export const ParentDashboardPage = () => {
         </div>
 
         <div className="px-4 pt-4">
-          {user?.role !== Role.Parent && (
+          {!isParent && (
             <button
               type="button"
               onClick={handleSwitch}
@@ -102,7 +103,7 @@ export const ParentDashboardPage = () => {
             </div>
           )}
 
-          {children && children.length > 0 ? (
+          {isParent && children.length > 0 ? (
             <div className="flex flex-col gap-3">
               {children.map((child) => (
                 <button
@@ -126,11 +127,18 @@ export const ParentDashboardPage = () => {
                 </button>
               ))}
             </div>
-          ) : (
+          ) : isParent ? (
             <div className="rounded-xl bg-white p-8 text-center shadow-sm">
               <p className="text-gray-500">Hali farzand bog&apos;lanmagan</p>
               <p className="mt-1 text-sm text-gray-400">
                 Yuqoridagi tugma orqali farzandingizni qo&apos;shing
+              </p>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-white p-8 text-center shadow-sm">
+              <p className="text-gray-500">Ota-ona rejimini yoqing</p>
+              <p className="mt-1 text-sm text-gray-400">
+                Keyin farzandingizni bog&apos;lab, natijalarini kuzatishingiz mumkin
               </p>
             </div>
           )}

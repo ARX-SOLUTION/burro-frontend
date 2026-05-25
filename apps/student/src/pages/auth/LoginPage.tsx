@@ -22,7 +22,7 @@ export const LoginPage = () => {
     setIsRedirecting(true);
 
     try {
-      const { url } = await authAPI.telegramUrl();
+      const { url } = await authAPI.telegramUrl(redirectUrl);
       window.location.href = url;
     } catch {
       toast.error('Unable to start Telegram login. Please try again.');

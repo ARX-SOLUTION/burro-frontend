@@ -25,3 +25,31 @@ export const buildAuthPathWithRedirect = (path: string, redirectUrl: string | nu
 
   return `${path}?${searchParams.toString()}`;
 };
+
+type TelegramOAuthState = {
+  redirect?: string;
+};
+
+const isSafeRedirectPath = (value: string | null | undefined): value is string =>
+  Boolean(value && value.startsWith('/') && !value.startsWith('//'));
+
+const decodeBase64Url = (value: string): string => {
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+  return atob(padded);
+};
+
+export const parseTelegramOAuthState = (state: string | null | undefined) => {
+  if (!state) return null;
+
+  try {
+    return JSON.parse(decodeBase64Url(state)) as TelegramOAuthState;
+  } catch {
+    return null;
+  }
+};
+
+export const getTelegramOAuthStateRedirect = (state: string | null | undefined) => {
+  const parsedState = parseTelegramOAuthState(state);
+  return isSafeRedirectPath(parsedState?.redirect) ? parsedState.redirect : null;
+};

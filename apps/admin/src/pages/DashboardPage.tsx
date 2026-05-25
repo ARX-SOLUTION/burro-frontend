@@ -57,8 +57,12 @@ export const DashboardPage = () => {
               . The analytics dashboard is available to admins and superadmins only.
             </p>
             <div className="mt-5">
-              <Button href="/burro" color="primary" iconTrailing={ArrowRight}>
-                Go to Burro
+              <Button
+                href="https://student.burroarab.uz/burro"
+                color="primary"
+                iconTrailing={ArrowRight}
+              >
+                Open student app
               </Button>
             </div>
           </div>

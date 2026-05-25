@@ -18,7 +18,7 @@ export const authRoutes: RouteObject[] = [
   {
     path: 'auth',
     element: (
-      <GuestGuard>
+      <GuestGuard defaultRedirect="/burro/parent">
         <AuthLayout />
       </GuestGuard>
     ),

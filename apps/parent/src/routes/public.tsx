@@ -34,7 +34,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/profile',
     element: (
       <AuthGuard>
-        <ParentGuard>
+        <ParentGuard fallbackPath="/burro/parent">
           <BurroProfilePage />
         </ParentGuard>
       </AuthGuard>
@@ -44,7 +44,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/children',
     element: (
       <AuthGuard>
-        <ParentGuard>
+        <ParentGuard fallbackPath="/burro/parent">
           <BurroChildrenPage />
         </ParentGuard>
       </AuthGuard>
@@ -54,7 +54,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/children/add',
     element: (
       <AuthGuard>
-        <ParentGuard>
+        <ParentGuard fallbackPath="/burro/parent">
           <BurroAddChildPage />
         </ParentGuard>
       </AuthGuard>
@@ -64,9 +64,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/parent',
     element: (
       <AuthGuard>
-        <ParentGuard>
-          <ParentDashboardPage />
-        </ParentGuard>
+        <ParentDashboardPage />
       </AuthGuard>
     ),
   },
@@ -74,7 +72,7 @@ export const publicRoutes: RouteObject[] = [
     path: 'burro/parent/children/:childId',
     element: (
       <AuthGuard>
-        <ParentGuard>
+        <ParentGuard fallbackPath="/burro/parent">
           <ParentChildDetailPage />
         </ParentGuard>
       </AuthGuard>

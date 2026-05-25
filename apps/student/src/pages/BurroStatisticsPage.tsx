@@ -134,31 +134,44 @@ export default function BurroStatisticsPage() {
           </div>
         </div>
 
-        {/* Weak letters */}
-        {stats && stats.weak_letters.length > 0 && (
+        {/* Recommendation card */}
+        {stats && (
           <div className="mt-6 px-4">
             <div className="rounded-[20px] bg-white/10 p-4">
-              <p className="mb-3 text-sm font-bold text-white">
-                Ko&apos;proq mashq kerak bo&apos;lgan harflar
-              </p>
-              <div className="space-y-3">
-                {stats.weak_letters.map((letter) => (
-                  <div
-                    key={`${letter.arabic}-${letter.sound}`}
-                    className="flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="font-arabic text-3xl font-bold text-white" dir="rtl">
-                        {letter.arabic}
-                      </span>
-                      <span className="text-sm text-white/60">{letter.sound}</span>
-                    </div>
-                    <span className="text-sm font-semibold text-red-400">
-                      {letter.error_count} xato
-                    </span>
+              {stats.weak_letters.length > 0 ? (
+                <>
+                  <p className="text-sm font-bold text-teal-300">📚 Tavsiya</p>
+                  <p className="mt-1 text-xs text-white/60">
+                    Kuchsiz harflaringizni mustahkamlash uchun quyidagilarni takrorlang:
+                  </p>
+                  <div className="mt-3 space-y-3">
+                    {stats.weak_letters.map((letter) => (
+                      <div
+                        key={`${letter.arabic}-${letter.sound}`}
+                        className="flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="font-arabic text-3xl font-bold text-white" dir="rtl">
+                            {letter.arabic}
+                          </span>
+                          <span className="text-sm text-white/60">{letter.sound}</span>
+                        </div>
+                        <span className="text-sm font-semibold text-red-400">
+                          {letter.error_count} xato
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-teal-300">🎉 Ajoyib!</p>
+                  <p className="mt-1 text-xs text-white/60">
+                    Barcha harflarni muvaffaqiyatli o&apos;zlashtirgansiz. Yangi modullarni
+                    o&apos;rganishda davom eting!
+                  </p>
+                </>
+              )}
             </div>
           </div>
         )}

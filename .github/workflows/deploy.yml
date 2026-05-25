@@ -221,7 +221,7 @@ jobs:
             awk '
               function is_target(line, d) {
                 d = "(student|parent|admin|api)\\.burroarab\\.uz"
-                return line ~ "^[[:space:]]*" d "([[:space:]]*\\{|[[:space:]]*,|[[:space:]]*)$"
+                return line ~ "^[[:space:]]*" d "([[:space:]]*\\{|[[:space:]]*,|$)"
               }
               function brace_delta(line, tmp, opens, closes) {
                 tmp = line

@@ -33,7 +33,7 @@ export const BurroHomePage = () => {
   const handleOpenModulesList = useCallback(() => navigate('/burro/modules'), [navigate]);
 
   const handleStartLesson = useCallback(
-    (lessonId: string) => navigate(lessonId ? `/burro/practice/${lessonId}` : '/burro/modules'),
+    (lessonId: string) => navigate(lessonId ? `/burro/modules/${lessonId}` : '/burro/modules'),
     [navigate],
   );
 

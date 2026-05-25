@@ -4,6 +4,7 @@ import { Navigate, type RouteObject } from 'react-router-dom';
 import { Role } from '@burro/shared/modules/auth';
 
 import { AuthGuard, RoleGuard } from '@burro/shared/components/guards';
+import { Button } from '@burro/shared/components/base/buttons/button';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { SettingsLayout } from '@/layouts/SettingsLayout';
 
@@ -15,12 +16,35 @@ const ProfileSettingsPage = lazy(() =>
   import('@/pages/settings/ProfileSettingsPage').then((m) => ({ default: m.ProfileSettingsPage })),
 );
 
+const ADMIN_ROLES = [Role.Admin, Role.Superadmin];
+
+const AdminAccessFallback = () => (
+  <div className="flex min-h-[420px] flex-col items-center justify-center gap-5 p-8 text-center">
+    <div>
+      <h1 className="text-xl font-semibold text-primary">Admin access only</h1>
+      <p className="mt-2 max-w-md text-sm text-tertiary">
+        This dashboard is only available to admin and superadmin accounts.
+      </p>
+    </div>
+    <div className="flex flex-wrap justify-center gap-3">
+      <Button href="https://student.burroarab.uz/burro" color="primary">
+        Open student app
+      </Button>
+      <Button href="https://parent.burroarab.uz/burro/parent" color="secondary">
+        Open parent app
+      </Button>
+    </div>
+  </div>
+);
+
 export const dashboardRoutes: RouteObject[] = [
   {
     path: 'dashboard',
     element: (
       <AuthGuard>
-        <DashboardLayout />
+        <RoleGuard roles={ADMIN_ROLES} pageLevel fallback={<AdminAccessFallback />}>
+          <DashboardLayout />
+        </RoleGuard>
       </AuthGuard>
     ),
     children: [
@@ -30,11 +54,7 @@ export const dashboardRoutes: RouteObject[] = [
       },
       {
         path: 'users',
-        element: (
-          <RoleGuard minimumRole={Role.Admin} pageLevel>
-            <UsersPage />
-          </RoleGuard>
-        ),
+        element: <UsersPage />,
       },
       {
         path: 'settings',

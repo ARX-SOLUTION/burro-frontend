@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from '@untitledui/icons';
+import { ArrowLeft, Trash02 } from '@untitledui/icons';
 
-import { useParentChildDetail } from '@/modules/parent';
+import { useParentChildDetail, useParentUnlink, useParentUpdateChild } from '@/modules/parent';
 
 import { usePageMetadata } from '@burro/shared/libs/usePageMetadata';
 
@@ -12,15 +12,44 @@ const statusLabels: Record<string, string> = {
   failed: 'Muvaffaqiyatsiz',
 };
 
+const progressStatusLabels: Record<string, { label: string; color: string }> = {
+  completed: { label: 'Yakunlangan', color: 'bg-green-100 text-green-700' },
+  in_progress: { label: 'Jarayonda', color: 'bg-yellow-100 text-yellow-700' },
+  failed: { label: 'Muvaffaqiyatsiz', color: 'bg-red-100 text-red-700' },
+  not_started: { label: "Boshlanmagan", color: 'bg-gray-100 text-gray-500' },
+};
+
 export const ParentChildDetailPage = () => {
   usePageMetadata({ title: 'Bola tafsilotlari' });
   const { childId } = useParams<{ childId: string }>();
   const navigate = useNavigate();
   const { data: child, isLoading } = useParentChildDetail(childId ?? '');
+  const unlinkMutation = useParentUnlink();
+  const updateChildMutation = useParentUpdateChild();
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [nameInput, setNameInput] = useState('');
 
   const handleBack = useCallback(() => {
     navigate(-1);
   }, [navigate]);
+
+  const handleUnlink = useCallback(() => {
+    if (!childId) return;
+    unlinkMutation.mutate(childId);
+  }, [childId, unlinkMutation]);
+
+  const handleStartEdit = useCallback(() => {
+    if (!child) return;
+    setNameInput(child.full_name);
+    setEditing(true);
+  }, [child]);
+
+  const handleSaveName = useCallback(() => {
+    if (!childId || !nameInput.trim()) return;
+    updateChildMutation.mutate({ childId, fullName: nameInput.trim() });
+    setEditing(false);
+  }, [childId, nameInput, updateChildMutation]);
 
   if (isLoading) {
     return (
@@ -56,8 +85,36 @@ export const ParentChildDetailPage = () => {
           <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-white/20 text-2xl font-bold text-white">
             {child.full_name[0]}
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-white">{child.full_name}</h1>
+          <div className="flex-1">
+            {editing ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={nameInput}
+                  onChange={(e) => setNameInput(e.target.value)}
+                  className="flex-1 rounded-lg border border-white/30 bg-white/10 px-3 py-1 text-sm text-white outline-none placeholder:text-white/40"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveName}
+                  disabled={updateChildMutation.isPending || !nameInput.trim()}
+                  className="rounded-lg bg-white/20 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                >
+                  Saqlash
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-white">{child.full_name}</h1>
+                <button
+                  type="button"
+                  onClick={handleStartEdit}
+                  className="text-xs text-teal-200 underline"
+                >
+                  Tahrirlash
+                </button>
+              </div>
+            )}
             <p className="mt-1 text-sm text-teal-100">
               {child.modules_completed}/{child.modules_total} modul
             </p>
@@ -92,6 +149,35 @@ export const ParentChildDetailPage = () => {
                   <p className="text-xs font-semibold text-red-500">{w.error_count} xato</p>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {child.module_progress.length > 0 && (
+          <div className="rounded-xl bg-white p-4 shadow-sm">
+            <h2 className="mb-3 text-sm font-semibold text-gray-900">Modullar</h2>
+            <div className="space-y-1.5">
+              {child.module_progress.map((m) => {
+                const ps = progressStatusLabels[m.status] ?? progressStatusLabels.not_started;
+                return (
+                  <div
+                    key={m.module_id}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
+                  >
+                    <span className="text-sm font-medium text-gray-900">{m.title}</span>
+                    <div className="flex items-center gap-2">
+                      {m.accuracy_pct !== null && (
+                        <span className="text-xs text-gray-400">{m.accuracy_pct}%</span>
+                      )}
+                      <span
+                        className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${ps.color}`}
+                      >
+                        {ps.label}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -132,6 +218,42 @@ export const ParentChildDetailPage = () => {
             </div>
           </div>
         )}
+
+        <div className="pt-4">
+          {showConfirm ? (
+            <div className="rounded-xl bg-white p-4 shadow-sm">
+              <p className="mb-3 text-sm font-medium text-gray-700">
+                Haqiqatan ham bu bolani ro'yxatdan o'chirmoqchimisiz?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(false)}
+                  className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUnlink}
+                  disabled={unlinkMutation.isPending}
+                  className="flex-1 rounded-lg bg-red-500 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  O'chirish
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowConfirm(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 py-3 text-sm font-medium text-red-600"
+            >
+              <Trash02 className="size-4" />
+              Bolani o'chirish
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -5,5 +5,7 @@ export {
   useParentChildren,
   useParentLink,
   useParentSwitch,
+  useParentUnlink,
+  useParentUpdateChild,
 } from './services';
-export type { ParentChildDetail, ParentChildListItem } from './types/ParentChild';
+export type { ModuleProgressItem, ParentChildDetail, ParentChildListItem } from './types/ParentChild';

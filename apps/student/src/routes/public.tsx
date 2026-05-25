@@ -1,5 +1,7 @@
-import { lazy } from 'react';
+import { lazy, type ReactNode } from 'react';
 import { type RouteObject } from 'react-router-dom';
+
+import { Role } from '@burro/shared/modules/auth';
 
 import { AuthGuard, StudentGuard } from '@burro/shared/components/guards';
 
@@ -36,6 +38,18 @@ const ModuleCompletedPage = lazy(() =>
   import('@/pages/ModuleCompletedPage').then((m) => ({ default: m.ModuleCompletedPage })),
 );
 
+const STUDENT_APP_ROLE_REDIRECTS: Partial<Record<Role, string>> = {
+  [Role.Parent]: 'https://parent.burroarab.uz/burro/parent',
+  [Role.Admin]: 'https://admin.burroarab.uz/dashboard',
+  [Role.Superadmin]: 'https://admin.burroarab.uz/dashboard',
+};
+
+const studentRoute = (children: ReactNode) => (
+  <AuthGuard>
+    <StudentGuard roleRedirects={STUDENT_APP_ROLE_REDIRECTS}>{children}</StudentGuard>
+  </AuthGuard>
+);
+
 export const publicRoutes: RouteObject[] = [
   {
     index: true,
@@ -47,73 +61,31 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: 'burro',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroHomePage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroHomePage />),
   },
   {
     path: 'burro/modules',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroModulePage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroModulePage />),
   },
   {
     path: 'burro/practice/:moduleId',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroPracticePage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroPracticePage />),
   },
   {
     path: 'burro/profile',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroProfilePage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroProfilePage />),
   },
   {
     path: 'burro/leaderboard',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroLeaderboardPage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroLeaderboardPage />),
   },
   {
     path: 'burro/statistics',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <BurroStatisticsPage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<BurroStatisticsPage />),
   },
   {
     path: 'burro/modules/:moduleId',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <ModuleMapPage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<ModuleMapPage />),
   },
   {
     path: 'burro/results',
@@ -125,13 +97,7 @@ export const publicRoutes: RouteObject[] = [
   },
   {
     path: 'burro/modules/:moduleId/complete',
-    element: (
-      <AuthGuard>
-        <StudentGuard>
-          <ModuleCompletedPage />
-        </StudentGuard>
-      </AuthGuard>
-    ),
+    element: studentRoute(<ModuleCompletedPage />),
   },
   {
     path: '*',

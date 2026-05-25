@@ -9,6 +9,7 @@ type AudioQuestionProps = {
   selectedOptionKey: string | null;
   feedbackCorrectKey?: string | null;
   isAnswered?: boolean;
+  isPlaying?: boolean;
   onReplay: () => void;
   onSelectOption: (optionKey: string) => void;
 };
@@ -19,6 +20,7 @@ export const AudioQuestion = memo(
     selectedOptionKey,
     feedbackCorrectKey,
     isAnswered,
+    isPlaying,
     onReplay,
     onSelectOption,
   }: AudioQuestionProps) => {
@@ -28,8 +30,8 @@ export const AudioQuestion = memo(
     );
 
     return (
-      <div className="px-6 pt-24 pb-36">
-        <h1 className="text-center text-[20px] leading-7 font-semibold text-gray-700">
+      <div className="px-6 pb-36 pt-24">
+        <h1 className="text-center text-[20px] font-semibold leading-7 text-gray-700">
           {question.prompt}
         </h1>
 
@@ -38,16 +40,29 @@ export const AudioQuestion = memo(
             <button
               type="button"
               onClick={onReplay}
-              className="flex size-32 items-center justify-center rounded-3xl bg-teal-600 text-white shadow-lg"
+              className={`flex size-32 items-center justify-center rounded-3xl bg-teal-600 text-white shadow-lg transition-transform ${
+                isPlaying ? 'scale-[1.03] ring-4 ring-teal-100' : ''
+              }`}
               aria-label="Audio eshitish"
             >
-              <Speaker03 className="size-12" />
+              <Speaker03 className={`size-12 ${isPlaying ? 'animate-pulse' : ''}`} />
             </button>
+
+            <div className="mt-3 flex h-5 items-end gap-1" aria-hidden="true">
+              {[0, 1, 2].map((bar) => (
+                <span
+                  key={bar}
+                  className={`w-1.5 rounded-full bg-teal-500 transition-all ${
+                    isPlaying ? (bar === 1 ? 'h-5' : 'h-3') : 'h-1.5 opacity-50'
+                  }`}
+                />
+              ))}
+            </div>
 
             <button
               type="button"
               onClick={onReplay}
-              className="mt-4 inline-flex items-center rounded-full bg-teal-50 px-3 py-1.5 text-sm leading-5 font-semibold text-teal-700"
+              className="mt-3 inline-flex items-center rounded-full bg-teal-50 px-3 py-1.5 text-sm font-semibold leading-5 text-teal-700"
             >
               <RefreshCcw01 className="mr-1 size-3.5" />
               Qayta eshitish

@@ -12,6 +12,9 @@ interface TelegramWebApp {
   initData: string;
   ready: () => void;
   expand: () => void;
+  HapticFeedback?: {
+    notificationOccurred: (type: 'success' | 'error' | 'warning') => void;
+  };
 }
 
 interface Window {

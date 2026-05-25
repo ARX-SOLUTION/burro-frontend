@@ -3,7 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { AUTH_SEARCH_PARAMS, authAPI, getDefaultRedirectForRole } from '@burro/shared/modules/auth';
+import {
+  AUTH_SEARCH_PARAMS,
+  authAPI,
+  getDefaultRedirectForRole,
+  getTelegramOAuthStateRedirect,
+} from '@burro/shared/modules/auth';
 import { userQueryKeys } from '@burro/shared/modules/users';
 
 import { tokenStorage } from '@burro/shared/libs/storage';
@@ -17,7 +22,9 @@ export const TelegramCallbackPage = () => {
   const queryClient = useQueryClient();
 
   const code = searchParams.get('code');
-  const redirectUrl = searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT);
+  const redirectUrl =
+    searchParams.get(AUTH_SEARCH_PARAMS.REDIRECT) ||
+    getTelegramOAuthStateRedirect(searchParams.get('state'));
 
   const { mutate, isPending } = useMutation({
     mutationFn: () => authAPI.telegramCodeLogin({ code: code ?? '' }),

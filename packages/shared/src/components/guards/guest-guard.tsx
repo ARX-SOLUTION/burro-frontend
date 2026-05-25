@@ -7,9 +7,10 @@ import { useAuth } from '@burro/shared/hooks/use-auth';
 
 type GuestGuardProps = {
   children: React.ReactNode;
+  defaultRedirect?: string;
 };
 
-export const GuestGuard = ({ children }: GuestGuardProps) => {
+export const GuestGuard = ({ children, defaultRedirect }: GuestGuardProps) => {
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
@@ -20,7 +21,7 @@ export const GuestGuard = ({ children }: GuestGuardProps) => {
   if (isAuthenticated) {
     const redirectParam = new URLSearchParams(location.search).get(AUTH_SEARCH_PARAMS.REDIRECT);
     const fromState = (location.state as { from?: string })?.from;
-    const fallbackRedirect = getDefaultRedirectForRole(user?.role);
+    const fallbackRedirect = defaultRedirect ?? getDefaultRedirectForRole(user?.role);
     const redirectUrl = redirectParam || fromState || fallbackRedirect;
 
     return <Navigate to={redirectUrl} replace />;

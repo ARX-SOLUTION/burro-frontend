@@ -9,8 +9,9 @@ export const parentQueryKeys = {
   childDetail: (id: string) => [...parentQueryKeys.all, 'child', id] as const,
 };
 
-export const useParentChildren = () =>
+export const useParentChildren = (enabled = true) =>
   useQuery<ParentChildListItem[]>({
     queryKey: parentQueryKeys.children(),
     queryFn: parentAPI.getChildren,
+    enabled,
   });

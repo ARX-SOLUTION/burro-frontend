@@ -17,8 +17,12 @@ export const authAPI = {
       .post<AuthSuccessResponse>(AUTH_ROUTES.telegram, { initData })
       .then((res) => res.data),
 
-  telegramUrl: () =>
-    authAxiosInstance.get<{ url: string }>(AUTH_ROUTES.telegramUrl).then((res) => res.data),
+  telegramUrl: (redirect?: string | null) =>
+    authAxiosInstance
+      .get<{ url: string }>(AUTH_ROUTES.telegramUrl, {
+        params: redirect ? { redirect } : undefined,
+      })
+      .then((res) => res.data),
 
   telegramCodeLogin: (payload: { code: string }) =>
     authAxiosInstance

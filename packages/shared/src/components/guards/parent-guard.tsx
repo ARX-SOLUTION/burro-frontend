@@ -7,9 +7,10 @@ import { useAuth } from '@burro/shared/hooks/use-auth';
 
 type ParentGuardProps = {
   children: React.ReactNode;
+  fallbackPath?: string;
 };
 
-export const ParentGuard = ({ children }: ParentGuardProps) => {
+export const ParentGuard = ({ children, fallbackPath }: ParentGuardProps) => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
@@ -21,7 +22,7 @@ export const ParentGuard = ({ children }: ParentGuardProps) => {
   }
 
   if (user.role !== Role.Parent) {
-    return <Navigate to={getDefaultRedirectForRole(user.role)} replace />;
+    return <Navigate to={fallbackPath ?? getDefaultRedirectForRole(user.role)} replace />;
   }
 
   return <>{children}</>;

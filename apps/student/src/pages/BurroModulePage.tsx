@@ -28,7 +28,7 @@ export const BurroModulePage = () => {
     [],
   );
 
-  const handleStart = useCallback((id: string) => navigate(`/burro/practice/${id}`), [navigate]);
+  const handleStart = useCallback((id: string) => navigate(`/burro/modules/${id}`), [navigate]);
 
   const handleRetry = useCallback(() => {
     refetch();

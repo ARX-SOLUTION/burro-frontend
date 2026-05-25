@@ -8,6 +8,14 @@ export type ParentChildListItem = {
   last_active: string | null;
 };
 
+export type ModuleProgressItem = {
+  module_id: string;
+  title: string;
+  order: number;
+  status: string;
+  accuracy_pct: number | null;
+};
+
 export type ParentChildDetail = {
   id: string;
   full_name: string;
@@ -24,4 +32,5 @@ export type ParentChildDetail = {
     accuracy_pct: number | null;
     started_at: string;
   }[];
+  module_progress: ModuleProgressItem[];
 };

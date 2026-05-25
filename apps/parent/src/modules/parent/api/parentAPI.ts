@@ -16,4 +16,12 @@ export const parentAPI = {
 
   getChildDetail: (childId: string) =>
     axiosInstance.get<ParentChildDetail>(`/parent/children/${childId}`).then((r) => r.data),
+
+  unlinkChild: (childId: string) =>
+    axiosInstance.delete<{ success: boolean }>(`/parent/children/${childId}`).then((r) => r.data),
+
+  updateChild: (childId: string, data: { fullName?: string }) =>
+    axiosInstance
+      .patch<{ success: boolean; full_name: string }>(`/parent/children/${childId}`, data)
+      .then((r) => r.data),
 };

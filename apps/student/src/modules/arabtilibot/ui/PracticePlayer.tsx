@@ -1,5 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getErrorMessage } from '@burro/shared/modules/common';
+import { toast } from 'sonner';
 
 import { mapAttemptQuestionsToView } from '@/modules/arabtilibot/libs/mappers';
 import { useAttemptQuestions } from '@/modules/arabtilibot/services/useAttemptQuestions';
@@ -7,7 +9,6 @@ import { useFinishAttempt } from '@/modules/arabtilibot/services/useFinishAttemp
 import { useStartAttempt } from '@/modules/arabtilibot/services/useStartAttempt';
 import { useSubmitAnswer } from '@/modules/arabtilibot/services/useSubmitAnswer';
 import type { LessonPlayQuestion } from '@/modules/arabtilibot/types/question';
-import { getErrorMessage } from '@burro/shared/modules/common';
 
 import { AudioQuestion } from './play/AudioQuestion';
 import { LessonPlayHeader } from './play/LessonPlayHeader';
@@ -17,9 +18,11 @@ import { ResultBanner } from './play/ResultBanner';
 export default function PracticePlayer() {
   const { moduleId } = useParams() as { moduleId?: string };
   const navigate = useNavigate();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [attemptId, setAttemptId] = useState('');
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [answeredQuestionIds, setAnsweredQuestionIds] = useState<string[]>([]);
   const [feedback, setFeedback] = useState<{
     isCorrect: boolean;
@@ -119,9 +122,17 @@ export default function PracticePlayer() {
   useEffect(() => {
     setSelected(null);
     setFeedback(null);
+    setIsAudioPlaying(false);
     resetSubmitAnswer();
     resetFinishAttempt();
   }, [index, resetFinishAttempt, resetSubmitAnswer]);
+
+  const notifyAnswerFeedback = useCallback((isCorrect: boolean) => {
+    window.Telegram?.WebApp?.HapticFeedback?.notificationOccurred(isCorrect ? 'success' : 'error');
+    if (!window.Telegram?.WebApp?.HapticFeedback && 'vibrate' in navigator) {
+      navigator.vibrate(isCorrect ? 30 : [35, 35, 35]);
+    }
+  }, []);
 
   const handleRetry = useCallback(() => {
     if (!moduleId) return;
@@ -164,14 +175,16 @@ export default function PracticePlayer() {
         allAnswered: result.all_answered,
         livesRemaining: result.lives_remaining,
       });
-    } catch {
-      return;
+      notifyAnswerFeedback(result.is_correct);
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Javobni yuborib bo'lmadi"));
     }
-  }, [selected, attemptId, currentQuestion, submitAnswer]);
+  }, [selected, attemptId, currentQuestion, notifyAnswerFeedback, submitAnswer]);
 
   const handleReplay = useCallback(() => {
-    const audio = document.querySelector<HTMLAudioElement>('audio[data-question]');
-    void audio?.play();
+    void audioRef.current?.play().catch(() => {
+      setIsAudioPlaying(false);
+    });
   }, []);
 
   const handleClose = useCallback(() => {
@@ -190,8 +203,8 @@ export default function PracticePlayer() {
       try {
         const result = await finishAttempt(attemptId);
         navigate('/burro/results', { state: result });
-      } catch {
-        return;
+      } catch (error) {
+        toast.error(getErrorMessage(error, "Darsni yakunlab bo'lmadi"));
       }
       return;
     }
@@ -217,6 +230,17 @@ export default function PracticePlayer() {
     }
   }, [attemptId, feedback, finishAttempt, index, navigate, questions, answeredQuestionIds]);
 
+  useEffect(() => {
+    if (!feedback) return undefined;
+
+    const delayMs = feedback.isCorrect ? 1500 : 3000;
+    const timer = window.setTimeout(() => {
+      void handleNext();
+    }, delayMs);
+
+    return () => window.clearTimeout(timer);
+  }, [feedback, handleNext]);
+
   if (!moduleId) {
     return (
       <div className="p-4">
@@ -231,7 +255,7 @@ export default function PracticePlayer() {
     return (
       <div className="min-h-screen bg-white">
         <div className="h-14 animate-pulse bg-gray-100" />
-        <div className="px-6 pt-24 pb-36">
+        <div className="px-6 pb-36 pt-24">
           <div className="mx-auto mb-8 h-6 w-48 animate-pulse rounded-full bg-gray-100" />
           <div className="mx-auto mb-12 h-32 w-32 animate-pulse rounded-2xl bg-gray-100" />
           <div className="grid grid-cols-2 gap-2">
@@ -285,6 +309,7 @@ export default function PracticePlayer() {
           selectedOptionKey={selected}
           feedbackCorrectKey={feedback?.correctAnswer ?? null}
           isAnswered={!!feedback}
+          isPlaying={isAudioPlaying}
           onReplay={handleReplay}
           onSelectOption={handleSelect}
         />
@@ -300,15 +325,20 @@ export default function PracticePlayer() {
 
       {currentQuestion.type === 'audio' && currentQuestion.audioUrl && (
         <audio
+          ref={audioRef}
           data-question
           src={currentQuestion.audioUrl}
           preload="auto"
           autoPlay
+          onPlay={() => setIsAudioPlaying(true)}
+          onPause={() => setIsAudioPlaying(false)}
+          onEnded={() => setIsAudioPlaying(false)}
+          onError={() => setIsAudioPlaying(false)}
           className="hidden"
         />
       )}
 
-      <div className="fixed right-0 bottom-0 left-0 bg-white px-4 pt-3 pb-6 shadow-[0_-1px_0_rgb(229,231,235)]">
+      <div className="fixed bottom-0 left-0 right-0 bg-white px-4 pb-6 pt-3 shadow-[0_-1px_0_rgb(229,231,235)]">
         {feedback && (
           <div className="mb-3">
             <ResultBanner
@@ -322,12 +352,12 @@ export default function PracticePlayer() {
         )}
 
         {!feedback && submitError && (
-          <div className="mb-3 rounded-lg bg-error-50 p-3 text-sm text-error-700">
+          <div className="bg-error-50 text-error-700 mb-3 rounded-lg p-3 text-sm">
             {getErrorMessage(submitError, "Javobni yuborib bo'lmadi")}
           </div>
         )}
         {finishError && (
-          <div className="mb-3 rounded-lg bg-error-50 p-3 text-sm text-error-700">
+          <div className="bg-error-50 text-error-700 mb-3 rounded-lg p-3 text-sm">
             {getErrorMessage(finishError, "Darsni yakunlab bo'lmadi")}
           </div>
         )}

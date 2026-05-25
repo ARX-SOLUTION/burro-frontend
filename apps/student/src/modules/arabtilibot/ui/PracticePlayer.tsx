@@ -202,7 +202,7 @@ export default function PracticePlayer() {
     if (feedback.allAnswered && attemptId) {
       try {
         const result = await finishAttempt(attemptId);
-        navigate('/burro/results', { state: result });
+        navigate('/burro/results', { state: { ...result, moduleId } });
       } catch (error) {
         toast.error(getErrorMessage(error, "Darsni yakunlab bo'lmadi"));
       }

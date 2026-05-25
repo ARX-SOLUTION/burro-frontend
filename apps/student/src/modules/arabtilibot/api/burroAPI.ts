@@ -1,4 +1,4 @@
-import axiosInstance from '@/services';
+import axiosInstance from '@burro/shared/services';
 
 import type {
   AttemptQuestionsResponse,

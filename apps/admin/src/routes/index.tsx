@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { RootLayout } from '@/layouts/root-layout';
+import { RootLayout } from '@burro/shared/layouts/root-layout';
 
 import { authRoutes } from './auth';
 import { dashboardRoutes } from './dashboard';

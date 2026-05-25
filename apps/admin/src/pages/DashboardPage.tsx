@@ -9,9 +9,9 @@ import { Badge } from '@burro/shared/components/base/badges/badges';
 import { Button } from '@burro/shared/components/base/buttons/button';
 import { PageLoading } from '@burro/shared/components/page-loading';
 import { useAuth } from '@burro/shared/hooks/use-auth';
-import { PageContent, PageHeader, PageWrapper } from '@/layouts/DashboardLayout';
+import { PageContent, PageHeader, PageWrapper } from '@burro/shared/layouts/DashboardLayout';
 import { usePageMetadata } from '@burro/shared/libs/usePageMetadata';
-import { useTheme } from '@/providers/theme-provider';
+import { useTheme } from '@burro/shared/providers/theme-provider';
 
 const ThemeIcons = {
   system: Monitor02,

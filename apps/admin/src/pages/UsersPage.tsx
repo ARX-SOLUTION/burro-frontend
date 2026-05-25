@@ -7,7 +7,7 @@ import type { User } from '@burro/shared/modules/users/types';
 
 import { QueryErrorBoundary } from '@burro/shared/components/application/error-boundary/query-error-boundary';
 import { Breadcrumb } from '@burro/shared/components/base/breadcrumb/breadcrumb';
-import { PageContent, PageHeader, PageWrapper } from '@/layouts/DashboardLayout';
+import { PageContent, PageHeader, PageWrapper } from '@burro/shared/layouts/DashboardLayout';
 import { usePageMetadata } from '@burro/shared/libs/usePageMetadata';
 
 export const UsersPage = () => {

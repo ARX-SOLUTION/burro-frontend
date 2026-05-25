@@ -5,8 +5,8 @@ import { Role } from '@burro/shared/modules/auth';
 
 import { AuthGuard, RoleGuard } from '@burro/shared/components/guards';
 import { Button } from '@burro/shared/components/base/buttons/button';
-import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { SettingsLayout } from '@/layouts/SettingsLayout';
+import { DashboardLayout } from '@burro/shared/layouts/DashboardLayout';
+import { SettingsLayout } from '@burro/shared/layouts/SettingsLayout';
 
 const DashboardPage = lazy(() =>
   import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),

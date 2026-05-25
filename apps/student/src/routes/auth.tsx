@@ -2,7 +2,7 @@ import { lazy } from 'react';
 import type { RouteObject } from 'react-router-dom';
 
 import { GuestGuard } from '@burro/shared/components/guards';
-import { AuthLayout } from '@/layouts/auth-layout';
+import { AuthLayout } from '@burro/shared/layouts/auth-layout';
 
 const LoginPage = lazy(() =>
   import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })),

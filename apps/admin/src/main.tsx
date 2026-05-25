@@ -3,11 +3,11 @@ import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 
 import { PageLoading } from '@burro/shared/components/page-loading';
-import { AuthProvider } from '@/contexts/auth-context';
-import { QueryProvider, ThemeProvider, ToastProvider } from '@/providers';
+import { AuthProvider } from '@burro/shared/contexts/auth-context';
+import { QueryProvider, ThemeProvider, ToastProvider } from '@burro/shared/providers';
 import { router } from '@/routes';
 
-import '@/styles/globals.css';
+import '@burro/shared/styles/globals.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
